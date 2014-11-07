@@ -71,13 +71,12 @@ dependencies {
     compile "codechicken:ForgeMultipart:${config.mc.version}-${config.fmp.version}:dev"
     compile "codechicken:NotEnoughItems:${config.mc.version}-${config.nei.version}:dev"
     compile "tconstruct:TConstruct:${config.mc.version}-${config.tc.version}:deobf"
-    compile name: 'ThermalExpansion', version: config.texpan.version, ext: 'jar'
-    compile name: 'CoFHCore', version: config.cofh.version, ext: 'jar'
+    compile group: 'thermalexpansion', name: 'ThermalExpansion', version: config.texpan.version, ext: 'jar'
+    compile group: 'cofh', name: 'CoFHCore', version: config.cofh.version, ext: 'jar'
 }
 
-def build_number = (System.getenv("BUILD_NUMBER") ?: "1")
+def build_number = (Integer.parseInt(System.getenv("BUILD_NUMBER") ?: "1")+51).toString()
 version = "${project.config.mod.version}."+build_number
-println "Building ${project.archivesBaseName} of version ${config.mc.version}-${config.forge.version}."
 
 minecraft {
     version = config.mc.version+"-"+config.forge.version
@@ -167,7 +166,7 @@ task integrationJar(type: Jar, dependsOn: reobf) {
         project.ext.baseExcludes.addAll(includes)
     }
     version = project.ext.jarVer
-    appendix = 'Integration'
+    classifier = 'Integration'
 }
 
 task lightingJar(type: Jar, dependsOn: reobf) {
@@ -184,7 +183,7 @@ task lightingJar(type: Jar, dependsOn: reobf) {
         project.ext.baseExcludes.addAll(includes)
     }
     version = project.ext.jarVer
-    appendix = 'Lighting'
+    classifier = 'Lighting'
 }
 
 task mechanicalJar(type: Jar, dependsOn: reobf) {
@@ -204,7 +203,7 @@ task mechanicalJar(type: Jar, dependsOn: reobf) {
         project.ext.baseExcludes.addAll(includes)
     }
     version = project.ext.jarVer
-    appendix = 'Mechanical_beta'
+    classifier = 'Mechanical_beta'
 }
 
 task worldJar(type: Jar, dependsOn: reobf) {
@@ -220,7 +219,7 @@ task worldJar(type: Jar, dependsOn: reobf) {
         project.ext.baseExcludes.addAll(includes)
     }
     version = project.ext.jarVer
-    appendix = 'World'
+    classifier = 'World'
 }
 
 task compatJar(type: Jar, dependsOn: reobf) {
@@ -244,7 +243,7 @@ task compatJar(type: Jar, dependsOn: reobf) {
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
     version = project.ext.jarVer
-    appendix = 'Compat'
+    classifier = 'Compat'
 }
 
 task baseJar(type: Jar, dependsOn: reobf) {
@@ -258,7 +257,7 @@ task baseJar(type: Jar, dependsOn: reobf) {
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
     version = project.ext.jarVer
-    appendix = 'Base'
+    classifier = 'Base'
 
 }
 
@@ -270,7 +269,6 @@ jar {
         attributes 'FMLCorePlugin': 'codechicken.core.launch.DepLoader'
         attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
-    classifier = 'universal'
 }
 
 task sourceJar(type: Jar) {
@@ -289,7 +287,13 @@ task deobfJar(type: Jar) {
     }
 }
 
-def deployMeta()
+def deployMetaFile()
+{
+    new File(new File(project.projectDir, "build/libs/"),
+            "deploymeta-${project.minecraft.version}-${project.version}.xml")
+}
+
+def createDeployMeta()
 {
     def writer = new StringWriter()
     def xml = new MarkupBuilder(writer)
@@ -297,6 +301,7 @@ def deployMeta()
     def today = new SimpleDateFormat('dd-MM-yyyy').format(new Date())
 
     xml.deployMeta() {
+        modversion(version)
 
         date(today)
 
@@ -304,21 +309,21 @@ def deployMeta()
             Minecraft(project.minecraft.version)
             Forge(config.forge.version)
             MrTJPCore(config.mrtjp.version)
+            FMP(config.fmp.version)
             CCL(config.ccl.version)
-            FML(config.fml.version)
         }
 
         isPublic(true)
 
         isRecommended(false)
     }
-    def file = new File(project.projectDir, "build/libs/deploymeta-${project.minecraft.version}-${project.version}.xml")
-    file.mkdirs()
-    def stream = new FileOutputStream(file)
-    stream.write(writer.toString().bytes)
-    stream.close()
 
-    return file
+    def file = deployMetaFile()
+
+    def stream = new FileOutputStream(file)
+    stream.write(writer.toString().getBytes())
+    stream.flush()
+    stream.close()
 }
 
 artifacts {
@@ -332,11 +337,12 @@ artifacts {
     archives sourceJar
     archives deobfJar
 
-    archives deployMeta()
+    archives deployMetaFile()
 }
 
 uploadArchives {
     dependsOn 'reobf'
+    doFirst {createDeployMeta()}
     repositories {
         if (project.hasProperty("mavenurl"))
         {

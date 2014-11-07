@@ -8,11 +8,10 @@ import cpw.mods.fml.relauncher.{Side, SideOnly}
 import mrtjp.core.gui.{GuiLib, Slot2, WidgetContainer}
 import mrtjp.core.inventory.SimpleInventory
 import mrtjp.core.item.ItemCore
-import mrtjp.core.util.Enum
 import mrtjp.core.world.WorldLib
 import mrtjp.projectred.ProjectRedExploration
 import mrtjp.projectred.core.{ItemCraftingDamage, PartDefs}
-import mrtjp.projectred.exploration.ToolDefs.ToolVal
+import mrtjp.projectred.exploration.ToolDefs.ToolDef
 import net.minecraft.block.{Block, BlockFlower, BlockLeaves}
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.creativetab.CreativeTabs
@@ -111,13 +110,13 @@ class BagInventory(player:EntityPlayer, bag:ItemStack) extends SimpleInventory(2
     private def loadInventory()
     {
         assertNBT(bag)
-        load(bag.getTagCompound.getCompoundTag("baginv"))
+        loadInv(bag.getTagCompound.getCompoundTag("baginv"))
     }
 
     private def saveInventory()
     {
         val nbt = new NBTTagCompound
-        save(nbt)
+        saveInv(nbt)
         assertNBT(bag)
         bag.getTagCompound.setTag("baginv", nbt)
         refreshNBT()
@@ -154,10 +153,8 @@ class BagInventory(player:EntityPlayer, bag:ItemStack) extends SimpleInventory(2
     }
 }
 
-object ToolDefs extends Enum
+object ToolDefs
 {
-    type EnumVal = ToolVal
-
     private val wood = new ItemStack(Blocks.planks)
     private val flint = new ItemStack(Items.flint)
     private val iron = new ItemStack(Items.iron_ingot)
@@ -170,84 +167,80 @@ object ToolDefs extends Enum
     import mrtjp.projectred.ProjectRedExploration.{toolMaterialPeridot, toolMaterialRuby, toolMaterialSapphire}
     import net.minecraft.item.Item.ToolMaterial.{EMERALD => toolMaterialEmerald, GOLD => toolMaterialGold, IRON => toolMaterialIron, STONE => toolMaterialStone, WOOD => toolMaterialWood}
 
-    val RUBYAXE = ToolDefs("axeruby", toolMaterialRuby, ruby)
-    val SAPPHIREAXE = ToolDefs("axesapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTAXE = ToolDefs("axeperidot", toolMaterialPeridot, peridot)
+    val RUBYAXE = ToolDef("axeruby", toolMaterialRuby, ruby)
+    val SAPPHIREAXE = ToolDef("axesapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTAXE = ToolDef("axeperidot", toolMaterialPeridot, peridot)
 
-    val RUBYPICKAXE = ToolDefs("pickaxeruby", toolMaterialRuby, ruby)
-    val SAPPHIREPICKAXE = ToolDefs("pickaxesapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTPICKAXE = ToolDefs("pickaxeperidot", toolMaterialPeridot, peridot)
+    val RUBYPICKAXE = ToolDef("pickaxeruby", toolMaterialRuby, ruby)
+    val SAPPHIREPICKAXE = ToolDef("pickaxesapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTPICKAXE = ToolDef("pickaxeperidot", toolMaterialPeridot, peridot)
 
-    val RUBYSHOVEL = ToolDefs("shovelruby", toolMaterialRuby, ruby)
-    val SAPPHIRESHOVEL = ToolDefs("shovelsapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTSHOVEL = ToolDefs("shovelperidot", toolMaterialPeridot, peridot)
+    val RUBYSHOVEL = ToolDef("shovelruby", toolMaterialRuby, ruby)
+    val SAPPHIRESHOVEL = ToolDef("shovelsapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTSHOVEL = ToolDef("shovelperidot", toolMaterialPeridot, peridot)
 
-    val RUBYSWORD = ToolDefs("swordruby", toolMaterialRuby, ruby)
-    val SAPPHIRESWORD = ToolDefs("swordsapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTSWORD = ToolDefs("swordperidot", toolMaterialPeridot, peridot)
+    val RUBYSWORD = ToolDef("swordruby", toolMaterialRuby, ruby)
+    val SAPPHIRESWORD = ToolDef("swordsapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTSWORD = ToolDef("swordperidot", toolMaterialPeridot, peridot)
 
-    val RUBYHOE = ToolDefs("hoeruby", toolMaterialRuby, ruby)
-    val SAPPHIREHOE = ToolDefs("hoesapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTHOE = ToolDefs("hoeperidot", toolMaterialPeridot, peridot)
+    val RUBYHOE = ToolDef("hoeruby", toolMaterialRuby, ruby)
+    val SAPPHIREHOE = ToolDef("hoesapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTHOE = ToolDef("hoeperidot", toolMaterialPeridot, peridot)
 
-    val WOODSAW = ToolDefs("sawwood", toolMaterialWood, wood)
-    val STONESAW = ToolDefs("sawstone", toolMaterialStone, flint)
-    val IRONSAW = ToolDefs("sawiron", toolMaterialIron, iron)
-    val GOLDSAW = ToolDefs("sawgold", toolMaterialGold, gold)
-    val RUBYSAW = ToolDefs("sawruby", toolMaterialRuby, ruby)
-    val SAPPHIRESAW = ToolDefs("sawsapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTSAW = ToolDefs("sawperidot", toolMaterialPeridot, peridot)
-    val DIAMONDSAW = ToolDefs("sawdiamond", toolMaterialEmerald, diamond)
+    val WOODSAW = ToolDef("sawwood", toolMaterialWood, wood)
+    val STONESAW = ToolDef("sawstone", toolMaterialStone, flint)
+    val IRONSAW = ToolDef("sawiron", toolMaterialIron, iron)
+    val GOLDSAW = ToolDef("sawgold", toolMaterialGold, gold)
+    val RUBYSAW = ToolDef("sawruby", toolMaterialRuby, ruby)
+    val SAPPHIRESAW = ToolDef("sawsapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTSAW = ToolDef("sawperidot", toolMaterialPeridot, peridot)
+    val DIAMONDSAW = ToolDef("sawdiamond", toolMaterialEmerald, diamond)
 
-    val WOODSICKLE = ToolDefs("sicklewood", toolMaterialWood, wood)
-    val STONESICKLE = ToolDefs("sicklestone", toolMaterialStone, flint)
-    val IRONSICKLE = ToolDefs("sickleiron", toolMaterialIron, iron)
-    val GOLDSICKLE = ToolDefs("sicklegold", toolMaterialGold, gold)
-    val RUBYSICKLE = ToolDefs("sickleruby", toolMaterialRuby, ruby)
-    val SAPPHIRESICKLE = ToolDefs("sicklesapphire", toolMaterialSapphire, sapphire)
-    val PERIDOTSICKLE = ToolDefs("sickleperidot", toolMaterialPeridot, peridot)
-    val DIAMONDSICKLE = ToolDefs("sicklediamond", toolMaterialEmerald, diamond)
+    val WOODSICKLE = ToolDef("sicklewood", toolMaterialWood, wood)
+    val STONESICKLE = ToolDef("sicklestone", toolMaterialStone, flint)
+    val IRONSICKLE = ToolDef("sickleiron", toolMaterialIron, iron)
+    val GOLDSICKLE = ToolDef("sicklegold", toolMaterialGold, gold)
+    val RUBYSICKLE = ToolDef("sickleruby", toolMaterialRuby, ruby)
+    val SAPPHIRESICKLE = ToolDef("sicklesapphire", toolMaterialSapphire, sapphire)
+    val PERIDOTSICKLE = ToolDef("sickleperidot", toolMaterialPeridot, peridot)
+    val DIAMONDSICKLE = ToolDef("sicklediamond", toolMaterialEmerald, diamond)
 
-    def apply(s:String, m:ToolMaterial, r:ItemStack) = new ToolVal(s, m, r)
-    class ToolVal(val unlocal:String, val mat:ToolMaterial, val repair:ItemStack) extends Value
-    {
-        override def name = unlocal
-    }
+    case class ToolDef(unlocal:String, mat:ToolMaterial, repair:ItemStack)
 }
 
 trait TGemTool extends Item
 {
-    setUnlocalizedName("projectred.exploration."+tool.unlocal)
-    setTextureName("projectred:gemtools/"+tool.unlocal)
+    setUnlocalizedName("projectred.exploration."+toolDef.unlocal)
+    setTextureName("projectred:gemtools/"+toolDef.unlocal)
     setCreativeTab(ProjectRedExploration.tabExploration)
-    GameRegistry.registerItem(this, "projectred.exploration."+tool.unlocal)
+    GameRegistry.registerItem(this, "projectred.exploration."+toolDef.unlocal)
 
-    def tool:ToolVal
+    def toolDef:ToolDef
 
     override def getIsRepairable(ist1:ItemStack, ist2:ItemStack) =
     {
-        if (tool.repair.isItemEqual(ist2)) true
+        if (toolDef.repair.isItemEqual(ist2)) true
         else super.getIsRepairable(ist1, ist2)
     }
 }
 
-// Weird scala compiler issue. These classes are implemented in java.
-class ItemGemAxe(override val tool:ToolVal) extends ItemAxe(tool.mat) with TGemTool
-class ItemGemPickaxe(override val tool:ToolVal) extends ItemPickaxe(tool.mat) with TGemTool
-class ItemGemShovel(override val tool:ToolVal) extends ItemSpade(tool.mat) with TGemTool
-class ItemGemSword(override val tool:ToolVal) extends ItemSword(tool.mat) with TGemTool
-class ItemGemHoe(override val tool:ToolVal) extends ItemHoe(tool.mat) with TGemTool
+import mrtjp.projectred.exploration.ItemToolProxies._
+class ItemGemAxe(override val toolDef:ToolDef) extends Axe(toolDef.mat) with TGemTool
+class ItemGemPickaxe(override val toolDef:ToolDef) extends Pickaxe(toolDef.mat) with TGemTool
+class ItemGemShovel(override val toolDef:ToolDef) extends Shovel(toolDef.mat) with TGemTool
+class ItemGemSword(override val toolDef:ToolDef) extends Sword(toolDef.mat) with TGemTool
+class ItemGemHoe(override val toolDef:ToolDef) extends ItemHoe(toolDef.mat) with TGemTool
 
-class ItemGemSaw(val tool:ToolVal) extends ItemCraftingDamage("projectred.exploration."+tool.unlocal) with Saw
+class ItemGemSaw(val toolDef:ToolDef) extends ItemCraftingDamage("projectred.exploration."+toolDef.unlocal) with Saw
 {
-    setMaxDamage(tool.mat.getMaxUses)
+    setMaxDamage(toolDef.mat.getMaxUses)
     setCreativeTab(ProjectRedExploration.tabExploration)
 
-    override def getCuttingStrength(item:ItemStack) = tool.mat.getHarvestLevel
+    override def getCuttingStrength(item:ItemStack) = toolDef.mat.getHarvestLevel
     override def registerIcons(reg:IIconRegister){}
 }
 
-class ItemGemSickle(override val tool:ToolVal) extends ItemTool(3, tool.mat, new java.util.HashSet) with TGemTool
+class ItemGemSickle(override val toolDef:ToolDef) extends ItemTool(3, toolDef.mat, new java.util.HashSet) with TGemTool
 {
     private val radiusLeaves = 1
     private val radiusCrops = 2
