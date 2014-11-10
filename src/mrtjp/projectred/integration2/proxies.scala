@@ -1,9 +1,15 @@
-package mrtjp.projectred.integration
+/*
+ * Copyright (c) 2014.
+ * Created by MrTJP.
+ * All rights reserved.
+ */
+package mrtjp.projectred.integration2
 
 import codechicken.lib.packet.PacketCustom
 import codechicken.multipart.MultiPartRegistry
 import codechicken.multipart.MultiPartRegistry.IPartFactory
 import cpw.mods.fml.relauncher.{Side, SideOnly}
+import mrtjp.core.gui.GuiHandler
 import mrtjp.projectred.ProjectRedIntegration
 import mrtjp.projectred.ProjectRedIntegration._
 import mrtjp.projectred.core.IProxy
@@ -13,31 +19,32 @@ class IntegrationProxy_server extends IProxy with IPartFactory
 {
     override def preinit()
     {
-        //PacketCustom.assignHandler(IntegrationSPH.channel, IntegrationSPH)
+        PacketCustom.assignHandler(IntegrationSPH.channel, IntegrationSPH) //TODO
     }
 
     override def init()
     {
-//        MultiPartRegistry.registerParts(this, Array[String](
-//            "pr_sgate", "pr_igate", "pr_agate",
-//            "pr_bgate", "pr_tgate", "pr_rgate"
-//        ))
+        MultiPartRegistry.registerParts(this, Array[String](
+            "pr_sgate", "pr_igate", "pr_agate",
+            "pr_bgate", "pr_tgate", "pr_rgate"
+        ))
 
-        itemPartGate = new ItemPartGate
+        itemPartGate2 = new ItemPartGate
 
-        IntegrationRecipes.initRecipes()
+        //IntegrationRecipes.initRecipes() //TODO
     }
 
     override def postinit(){}
 
     override def createPart(name:String, client:Boolean) = name match
     {
-        case "pr_sgate" => new SimpleGatePart
-        case "pr_igate" => new InstancedRsGatePart
+        case "pr_sgate" => new ComboGatePart
+        case "pr_igate" => new SequentialGatePart
+        case "pr_agate" => null
         case "pr_bgate" => new BundledGatePart
-        case "pr_agate" => new ArrayGatePart
-        case "pr_tgate" => new InstancedRsGatePartT
-        case "pr_rgate" => new RowGatePart
+        case "pr_tgate" => new SequentialGatePartT
+        case "pr_rgate" => null
+        case _ => null
     }
 
     override def version = "@VERSION@"
@@ -46,18 +53,24 @@ class IntegrationProxy_server extends IProxy with IPartFactory
 
 class IntegrationProxy_client extends IntegrationProxy_server
 {
+    val timerGui = 10
+    val counterGui = 11
+
     @SideOnly(Side.CLIENT)
     override def preinit()
     {
         super.preinit()
-        //PacketCustom.assignHandler(IntegrationCPH.channel, IntegrationCPH)
+        PacketCustom.assignHandler(IntegrationCPH.channel, IntegrationCPH)
     }
 
     @SideOnly(Side.CLIENT)
     override def init()
     {
         super.init()
-        MinecraftForgeClient.registerItemRenderer(ProjectRedIntegration.itemPartGate, GateItemRenderer)
+        MinecraftForgeClient.registerItemRenderer(ProjectRedIntegration.itemPartGate2, GateItemRenderer)
+
+        GuiHandler.register(GuiTimer, timerGui)
+        GuiHandler.register(GuiCounter, counterGui)
     }
 }
 

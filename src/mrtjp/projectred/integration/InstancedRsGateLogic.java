@@ -1,17 +1,17 @@
 package mrtjp.projectred.integration;
 
-import mrtjp.projectred.api.IScrewdriver;
-import mrtjp.projectred.core.Configurator;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import codechicken.lib.data.MCDataInput;
 import codechicken.lib.data.MCDataOutput;
 import codechicken.lib.vec.BlockCoord;
 import codechicken.lib.vec.Rotation;
 import codechicken.multipart.INeighborTileChange;
 import codechicken.multipart.handler.MultipartSaveLoad;
+import mrtjp.projectred.api.IScrewdriver;
+import mrtjp.projectred.core.Configurator;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 
 public abstract class InstancedRsGateLogic extends RedstoneGateLogic<InstancedRsGatePart>
@@ -1103,12 +1103,12 @@ public abstract class InstancedRsGateLogic extends RedstoneGateLogic<InstancedRs
 
         public boolean left()
         {
-            return (state2()&1<<1) != 0;
+            return (state2()&2) != 0;
         }
 
         public boolean pulsing()
         {
-            return (state2()&1<<2) != 0;
+            return (state2()&4) != 0;
         }
 
         public void setPulsing()

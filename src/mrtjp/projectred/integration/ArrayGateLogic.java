@@ -5,10 +5,10 @@ import mrtjp.projectred.transmission.IRedwireEmitter;
 
 public abstract class ArrayGateLogic extends GateLogic<ArrayGatePart>
 {
-    public static ArrayGateLogic[] logic = new ArrayGateLogic[] { 
-        new Null(), 
-        new Invert(), 
-        new Buffer() 
+    public static ArrayGateLogic[] logic = new ArrayGateLogic[]{
+            new Null(),
+            new Invert(),
+            new Buffer()
     };
 
     @Override
@@ -20,12 +20,12 @@ public abstract class ArrayGateLogic extends GateLogic<ArrayGatePart>
     @Override
     public void onChange(ArrayGatePart gate)
     {
-        boolean oldSignal = (gate.state & 1) != 0;
+        boolean oldSignal = (gate.state&1) != 0;
         boolean newSignal = gate.signal1 != 0;
 
-        if (oldSignal != newSignal)
+        if(oldSignal != newSignal)
         {
-            gate.setState(gate.state & 2 | (newSignal ? 1 : 0));
+            gate.setState(gate.state&2|(newSignal ? 1 : 0));
             gate.scheduleTick(2);
             gate.tile().markDirty();// save
         }
@@ -34,13 +34,13 @@ public abstract class ArrayGateLogic extends GateLogic<ArrayGatePart>
     @Override
     public void scheduledTick(ArrayGatePart gate)
     {
-        boolean input = (gate.state & 1) != 0;
-        boolean oldOutput = (gate.state & 2) != 0;
+        boolean input = (gate.state&1) != 0;
+        boolean oldOutput = (gate.state&2) != 0;
         boolean newOutput = !input;
 
-        if (oldOutput != newOutput)
+        if(oldOutput != newOutput)
         {
-            gate.setState(gate.state & 1 | (newOutput ? 2 : 0));
+            gate.setState(gate.state&1|(newOutput ? 2 : 0));
             gate.sendStateUpdate();
             gate.tile().markDirty();
             gate.onChange();
@@ -80,7 +80,7 @@ public abstract class ArrayGateLogic extends GateLogic<ArrayGatePart>
         @Override
         public boolean powerUp(int state)
         {
-            return (state & 2) != 0;
+            return (state&2) != 0;
         }
     }
 
@@ -89,7 +89,7 @@ public abstract class ArrayGateLogic extends GateLogic<ArrayGatePart>
         @Override
         public boolean powerUp(int state)
         {
-            return (state & 2) == 0;
+            return (state&2) == 0;
         }
     }
 }

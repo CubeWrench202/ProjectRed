@@ -32,6 +32,13 @@ trait TFaceRSAcquisitions extends TRSAcquisitionsCommons with TFaceAcquisitions 
         else 0
     }
 
+    def calcMaxSignal(r:Int, requireStrong:Boolean):Int =
+    {
+        val i = calcStrongSignal(r)
+        if (i > 0 || requireStrong) i
+        else calcWeakSignal(r)
+    }
+
     def calcUndersideSignal =
     {
         val pos = new BlockCoord(tile).offset(side)
