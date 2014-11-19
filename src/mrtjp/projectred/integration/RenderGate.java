@@ -7,7 +7,6 @@ import codechicken.lib.vec.RedundantTransformation;
 import codechicken.lib.vec.Transformation;
 import codechicken.lib.vec.Vector3;
 import mrtjp.projectred.integration.BundledGateLogic.BusTransceiver;
-import mrtjp.projectred.integration.InstancedRsGateLogic.TimerGateLogic;
 import net.minecraft.client.renderer.texture.IIconRegister;
 
 import java.util.Arrays;
@@ -871,7 +870,7 @@ public class RenderGate
         @Override
         public void prepareDynamic(InstancedRsGatePart part, float frame)
         {
-            pointer.angle = ((TimerGateLogic)part.getLogic()).interpPointer(frame)*MathHelper.pi*2;
+            pointer.angle = ((InstancedRsGateLogic.TimerGateLogic)part.getLogic()).interpPointer(frame)*MathHelper.pi*2;
         }
 
         @Override

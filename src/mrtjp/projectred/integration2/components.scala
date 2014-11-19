@@ -8,6 +8,7 @@ package mrtjp.projectred.integration2
 import codechicken.lib.colour.Colour
 import codechicken.lib.lighting.{PlanarLightModel, PlanarLightMatrix, LightModel}
 import codechicken.lib.math.MathHelper
+import codechicken.lib.render.CCRenderState.IVertexOperation
 import codechicken.lib.render.uv._
 import codechicken.lib.render._
 import codechicken.lib.vec._
@@ -432,9 +433,23 @@ object WireModel2D
     def claimIdx() = { iconCounter += 1; iconCounter-1}
 }
 
-class RedstoneTorchModel(x:Double, z:Double, h:Int) extends OnOffModel(RedstoneTorchModel.genModel(x, z, h))
+trait TRedstoneTorchModel extends OnOffModel
 {
-    var lightPos = new Vector3(x, h-1, z).multiply(1/16D)
+    def getLightPos:Vector3
+}
+
+class RedstoneTorchModel(x:Double, z:Double, h:Int) extends OnOffModel(RedstoneTorchModel.genModel(x, z, h)) with TRedstoneTorchModel
+{
+    override val getLightPos = new Vector3(x, h-1, z).multiply(1/16D)
+
+    override def getIcons = redstoneTorchIcons
+}
+
+class FlippedRSTorchModel(x:Double, z:Double) extends OnOffModel(RedstoneTorchModel.genModel(x, z, 4).apply(
+    new Rotation(180*MathHelper.torad, 0, 0, 1).at(Vector3.center).`with`(new Translation(new Vector3(0, -6, 0).
+            multiply(1/16D))))) with TRedstoneTorchModel
+{
+    override val getLightPos = new Vector3(x, 4-1, z).multiply(1/16D)
 
     override def getIcons = redstoneTorchIcons
 }
@@ -704,4 +719,79 @@ class InputPanelButtonsModel extends ComponentModel
         for (i <- 0 until 16) if ((pressMask&1<<i) != 0)
             RenderHalo.addLight(pos.x, pos.y, pos.z, i, lights(i).copy.apply(orientationT))
     }
+}
+
+abstract class CellWireModel extends ComponentModel
+{
+    var signal:Byte = 0
+
+    def signalColour(signal:Byte) = (signal&0xFF)/2+60<<24|0xFF
+
+    def colourMult:IVertexOperation = ColourMultiplier.instance(signalColour(signal))
+}
+
+object CellTopWireModel
+{
+    val left = new Array[CCModel](24)
+    val right = new Array[CCModel](24)
+
+    {
+        val cellWireLeft = cellWireSide.copy.apply(new Translation(-7.001/16D, 0, 0))
+        val cellWireRight = cellWireSide.copy.apply(new Translation(7.001/16D, 0, 0))
+
+        for (i <- 0 until 24)
+        {
+            left(i) = bakeCopy(cellWireLeft, i)
+            right(i) = bakeCopy(cellWireRight, i)
+        }
+    }
+}
+
+class CellTopWireModel(wireTop:CCModel) extends CellWireModel
+{
+    val top = new Array[CCModel](24)
+    var conn = 0
+
+    for (i <- 0 until 24) top(i) = bakeCopy(wireTop, i)
+
+    override def renderModel(t:Transformation, orient:Int)
+    {
+        val icont = new IconTransformation(cellIcon)
+        top(orient).render(t, icont, colourMult)
+        import CellTopWireModel._
+        if ((conn&2) == 0) right(orient).render(t, icont, colourMult)
+        if ((conn&8) == 0) left(orient).render(t, icont, colourMult)
+    }
+}
+
+class CellBottomWireModel(wireBottom:CCModel) extends CellWireModel
+{
+    val bottom = new Array[CCModel](24)
+
+    for (i <- 0 until 24) bottom(i) = bakeCopy(wireBottom, i)
+
+    override def renderModel(t:Transformation, orient:Int)
+    {
+        bottom(orient).render(t, new IconTransformation(cellIcon), colourMult)
+    }
+}
+
+class CellFrameModel extends SingleComponentModel(cellFrame)
+{
+    override def getUVT = new IconTransformation(cellIcon)
+}
+
+class CellPlateModel extends SingleComponentModel(cellPlate)
+{
+    override def getUVT = new IconTransformation(cellIcon)
+}
+
+class NullCellBaseModel extends SingleComponentModel(nullCellBase)
+{
+    override def getUVT = new IconTransformation(cellIcon)
+}
+
+class ExtendedCellBaseModel extends SingleComponentModel(extendedCellBase)
+{
+    override def getUVT = new IconTransformation(cellIcon)
 }

@@ -31,14 +31,12 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
     var schedTime = 0L
 
     def getLogic[T]:T
+    def getLogicPrimitive = getLogic[GateLogic[GatePart]]
 
     def subID = gateSubID&0xFF
 
     def shape = gateShape&0xFF
-    def setShape(s:Int)
-    {
-        gateShape = s.asInstanceOf[Byte]
-    }
+    def setShape(s:Int){ gateShape = s.toByte }
 
     def preparePlacement(player:EntityPlayer, pos:BlockCoord, side:Int, meta:Int)
     {
@@ -96,13 +94,13 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
     override def discoverOpen(dir:Int) = true
 
     override def canConnectPart(part:IConnectable, r:Int) =
-        getLogic[GateLogic[GatePart]].canConnecetTo(this, part, toInternal(r))
+        getLogicPrimitive.canConnecetTo(this, part, toInternal(r))
 
     override def canConnectCorner(r:Int) = false
 
     override def scheduledTick()
     {
-        getLogic[GateLogic[GatePart]].scheduledTick(this)
+        getLogicPrimitive.scheduledTick(this)
     }
 
     override def scheduleTick(ticks:Int)
@@ -122,13 +120,13 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
     def onChange()
     {
         processScheduled()
-        getLogic[GateLogic[GatePart]].onChange(this)
+        getLogicPrimitive.onChange(this)
     }
 
     override def update()
     {
         if (!world.isRemote) processScheduled()
-        getLogic[GateLogic[GatePart]].onTick(this)
+        getLogicPrimitive.onTick(this)
     }
 
     override def onPartChanged(part:TMultiPart)
@@ -155,7 +153,7 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
         super.onAdded()
         if (!world.isRemote)
         {
-            getLogic[GateLogic[GatePart]].setup(this)
+            getLogicPrimitive.setup(this)
             updateInward()
             onChange()
         }
@@ -165,6 +163,12 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
     {
         super.onRemoved()
         if (!world.isRemote) notifyAllExternals()
+    }
+
+    override def onWorldJoin()
+    {
+        super.onWorldJoin()
+        if (getLogic == null) tile.remPart(this)
     }
 
     def canStay =
@@ -197,11 +201,11 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
 
     def getGateDef = GateDefinition(subID)
 
-    override def getBounds = FaceMicroClass.aBounds(0x10|side)
+    override def getBounds = getLogicPrimitive.getBounds(this)
 
-    override def getSubParts = Seq(new IndexedCuboid6(-1, getBounds))++getLogic[GateLogic[GatePart]].getSubParts(this)
+    override def getSubParts = Seq(new IndexedCuboid6(-1, getBounds))++getLogicPrimitive.getSubParts(this)
 
-    override def getOcclusionBoxes = Seq(getBounds)
+    override def getOcclusionBoxes = getLogicPrimitive.getOcclusions(this)
 
     override def getStrength(hit:MovingObjectPosition, player:EntityPlayer) = 1.75f
 
@@ -209,11 +213,11 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
 
     override def solid(side:Int) = false
 
-    override def getLightValue = getLogic[GateLogic[GatePart]].lightLevel
+    override def getLightValue = getLogicPrimitive.lightLevel
 
     override def activate(player:EntityPlayer, hit:MovingObjectPosition, held:ItemStack):Boolean =
     {
-        if (getLogic[GateLogic[GatePart]].activate(this, player, held, hit)) return true
+        if (getLogicPrimitive.activate(this, player, held, hit)) return true
 
         if (held != null && held.getItem.isInstanceOf[IScrewdriver])
         {
@@ -230,7 +234,7 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
 
     def configure()
     {
-        if (getLogic[GateLogic[GatePart]].cycleShape(this))
+        if (getLogicPrimitive.cycleShape(this))
         {
             updateInward()
             tile.markDirty()
@@ -327,7 +331,9 @@ abstract class GateLogic[T <: GatePart]
 
     def activate(gate:T, player:EntityPlayer, held:ItemStack, hit:MovingObjectPosition) = false
 
+    def getBounds(gate:T) = FaceMicroClass.aBounds(0x10|gate.side)
     def getSubParts(gate:T) = Seq[IndexedCuboid6]()
+    def getOcclusions(gate:T):Seq[Cuboid6] = GatePart.oBoxes(gate.side)
 
     def lightLevel = 7
 }

@@ -17,13 +17,14 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.MovingObjectPosition
 
-class SequentialGatePart extends ComboGatePart with TComplexGatePart
+class SequentialGatePart extends RedstoneGatePart with TComplexGatePart
 {
     private var logic:SequentialGateLogic = null
 
     override def getType = "pr_igate"
 
     override def getLogic[T]:T = logic.asInstanceOf[T]
+    def getLogicSequential = getLogic[SequentialGateLogic]
 
     override def assertLogic()
     {
@@ -791,7 +792,10 @@ class Comparator(gate:SequentialGatePart) extends SequentialGateLogic(gate) with
     var lState2:Short = 0
 
     def state2 = lState2&0xFFFF
-    def setState2(i:Int){ lState2 = i.asInstanceOf[Short] }
+    def setState2(i:Int){ lState2 = i.toShort }
+
+    override def inputMask(shape:Int) = 0xE
+    override def outputMask(shape:Int) = 1
 
     override def save(tag:NBTTagCompound){ tag.setShort("state2", lState2) }
     override def load(tag:NBTTagCompound){ lState2 = tag.getShort("state2") }

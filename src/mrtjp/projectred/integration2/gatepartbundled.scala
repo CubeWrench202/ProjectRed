@@ -21,7 +21,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.MovingObjectPosition
 
-class BundledGatePart extends ComboGatePart with TComplexGatePart with TFaceBundledAquisitions with IBundledEmitter
+class BundledGatePart extends RedstoneGatePart with TComplexGatePart with TFaceBundledAquisitions with IBundledEmitter
 {
     private var logic:BundledGateLogic = null
 

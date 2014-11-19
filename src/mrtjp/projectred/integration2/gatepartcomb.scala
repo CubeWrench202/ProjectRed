@@ -7,92 +7,19 @@ package mrtjp.projectred.integration2
 
 import java.util.Random
 
-import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import mrtjp.projectred.api.IScrewdriver
-import mrtjp.projectred.core.{TFaceOrient, Configurator}
+import mrtjp.projectred.core.TFaceOrient
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.MovingObjectPosition
 import net.minecraft.world.EnumSkyBlock
 
 class ComboGatePart extends RedstoneGatePart
 {
-    /**
-     * Mapped inputs and outputs of the gate.
-     * OOOO IIII
-     * High nybble is output.
-     * Low nybble is input
-     */
-    private var gateState:Byte = 0
-
-    def state = gateState&0xFF
-    def setState(s:Int)
-    {
-        gateState = s.asInstanceOf[Byte]
-    }
-
     override def getLogic[T] = ComboGateLogic.instances(subID).asInstanceOf[T]
     def getLogicCombo = getLogic[ComboGateLogic]
 
-    override def save(tag:NBTTagCompound)
-    {
-        super.save(tag)
-        tag.setByte("state", gateState)
-    }
-
-    override def load(tag:NBTTagCompound)
-    {
-        super.load(tag)
-        gateState = tag.getByte("state")
-    }
-
-    override def writeDesc(packet:MCDataOutput)
-    {
-        super.writeDesc(packet)
-        packet.writeByte(gateState)
-    }
-
-    override def readDesc(packet:MCDataInput)
-    {
-        super.readDesc(packet)
-        gateState = packet.readByte
-    }
-
-    override def read(packet:MCDataInput, key:Int) = key match
-    {
-        case 10 =>
-            gateState = packet.readByte()
-            if (Configurator.staticGates) tile.markRender()
-        case _ => super.read(packet, key)
-    }
-
-    override def onWorldJoin()
-    {
-        super.onWorldJoin()
-        if (getLogic == null) tile.remPart(this)
-    }
-
     override def getType = "pr_sgate"
-
-    def sendStateUpdate()
-    {
-        getWriteStreamOf(10).writeByte(gateState)
-    }
-
-    def onInputChange()
-    {
-        tile.markDirty()
-        sendStateUpdate()
-    }
-
-    def onOutputChange(mask:Int)
-    {
-        tile.markDirty()
-        sendStateUpdate()
-        tile.internalPartChange(this)
-        notifyExternals(toAbsoluteMask(mask))
-    }
 }
 
 object ComboGateLogic
@@ -122,16 +49,63 @@ object ComboGateLogic
         instances(defs.TransparentLatch.ordinal) = TransparentLatch
         instances(defs.LightSensor.ordinal) = LightSensor
         instances(defs.RainSensor.ordinal) = RainSensor
-
-        instances(defs.ANDCell.ordinal) = ANDCell
     }
 }
 
-class ComboGateLogic extends RedstoneGateLogic[ComboGatePart]
+trait TSimpleRSGateLogic[T <: RedstoneGatePart] extends RedstoneGateLogic[T]
 {
-    override def getOutput(gate:ComboGatePart, r:Int) =
-        if ((gate.state&0x10<<r) != 0) 15 else 0
+    def getDelay(shape:Int) = 2
 
+    def feedbackMask(shape:Int) = 0
+
+    def calcOutput(gate:T, input:Int) = 0
+
+    override def onChange(gate:T)
+    {
+        val iMask = inputMask(gate.shape)
+        val oMask = outputMask(gate.shape)
+        val fMask = feedbackMask(gate.shape)
+        val oldInput = gate.state&0xF
+        val newInput = getInput(gate, iMask|fMask)
+        if (oldInput != newInput)
+        {
+            gate.setState(gate.state&0xF0|newInput)
+            gate.onInputChange()
+        }
+
+        val newOutput = calcOutput(gate, gate.state&iMask)&oMask
+        if (newOutput != (gate.state>>4)) gate.scheduleTick(getDelay(gate.shape))
+    }
+
+    override def scheduledTick(gate:T)
+    {
+        val iMask = inputMask(gate.shape)
+        val oMask = outputMask(gate.shape)
+        val oldOutput = gate.state>>4
+        val newOutput = calcOutput(gate, gate.state&iMask)&oMask
+        if (oldOutput != newOutput)
+        {
+            gate.setState(gate.state&0xF|newOutput<<4)
+            gate.onOutputChange(oMask)
+        }
+        onChange(gate)
+    }
+
+    override def setup(gate:T)
+    {
+        val iMask = inputMask(gate.shape)
+        val oMask = outputMask(gate.shape)
+        val output = calcOutput(gate, getInput(gate, iMask))&oMask
+        if (output != 0)
+        {
+            gate.setState(output<<4)
+            gate.onOutputChange(output) //use output for change mask because nothing is going low
+        }
+    }
+}
+
+abstract class ComboGateLogic extends RedstoneGateLogic[ComboGatePart] with TSimpleRSGateLogic[ComboGatePart]
+{
     override def cycleShape(gate:ComboGatePart) =
     {
         val oldShape = gate.shape
@@ -155,53 +129,6 @@ class ComboGateLogic extends RedstoneGateLogic[ComboGatePart]
 
     def deadSides = 0
     def maxDeadSides = deadSides-1
-
-    def getDelay(shape:Int) = 2
-
-    def feedbackMask(shape:Int) = 0
-
-    override def onChange(gate:ComboGatePart)
-    {
-        val iMask = inputMask(gate.shape)
-        val oMask = outputMask(gate.shape)
-        val fMask = feedbackMask(gate.shape)
-        val oldInput = gate.state&0xF
-        val newInput = getInput(gate, iMask|fMask)
-        if (oldInput != newInput)
-        {
-            gate.setState(gate.state&0xF0|newInput)
-            gate.onInputChange()
-        }
-
-        val newOutput = calcOutput(gate, gate.state&iMask)&oMask
-        if (newOutput != (gate.state>>4)) gate.scheduleTick(getDelay(gate.shape))
-    }
-
-    override def scheduledTick(gate:ComboGatePart)
-    {
-        val iMask = inputMask(gate.shape)
-        val oMask = outputMask(gate.shape)
-        val oldOutput = gate.state>>4
-        val newOutput = calcOutput(gate, gate.state&iMask)&oMask
-        if (oldOutput != newOutput)
-        {
-            gate.setState(gate.state&0xF|newOutput<<4)
-            gate.onOutputChange(oMask)
-        }
-        onChange(gate)
-    }
-
-    override def setup(gate:ComboGatePart)
-    {
-        val iMask = inputMask(gate.shape)
-        val oMask = outputMask(gate.shape)
-        val output = calcOutput(gate, getInput(gate, iMask))&oMask
-        if (output != 0)
-        {
-            gate.setState(output<<4)
-            gate.onOutputChange(output) //use output for change mask because nothing is going low
-        }
-    }
 }
 
 object OR extends ComboGateLogic
@@ -209,6 +136,7 @@ object OR extends ComboGateLogic
     override def deadSides = 3
 
     override def inputMask(shape:Int) = ~shape<<1&0xE
+    override def outputMask(shape:Int) = 1
 
     override def calcOutput(gate:ComboGatePart, input:Int) = if (input != 0) 1 else 0
 }
@@ -218,6 +146,7 @@ object NOR extends ComboGateLogic
     override def feedbackMask(shape:Int) = 1
 
     override def inputMask(shape:Int) = ~shape<<1&0xE
+    override def outputMask(shape:Int) = 1
 
     override def deadSides = 3
 
@@ -244,6 +173,7 @@ object NOT extends ComboGateLogic
 object AND extends ComboGateLogic
 {
     override def inputMask(shape:Int) = ~shape<<1&0xE
+    override def outputMask(shape:Int) = 1
 
     override def deadSides = 3
 
@@ -253,6 +183,7 @@ object AND extends ComboGateLogic
 object NAND extends ComboGateLogic
 {
     override def inputMask(shape:Int) = ~shape<<1&0xE
+    override def outputMask(shape:Int) = 1
 
     override def deadSides = 3
 
@@ -262,6 +193,7 @@ object NAND extends ComboGateLogic
 object XOR extends ComboGateLogic
 {
     override def inputMask(shape:Int) = 10
+    override def outputMask(shape:Int) = 1
 
     override def calcOutput(gate:ComboGatePart, input:Int) =
     {
@@ -274,6 +206,7 @@ object XOR extends ComboGateLogic
 object XNOR extends ComboGateLogic
 {
     override def inputMask(shape:Int) = 10
+    override def outputMask(shape:Int) = 1
 
     override def calcOutput(gate:ComboGatePart, input:Int) =
     {
@@ -314,6 +247,7 @@ object Pulse extends ComboGateLogic
     override def calcOutput(gate:ComboGatePart, input:Int) = 0
 
     override def inputMask(shape:Int) = 4
+    override def outputMask(shape:Int) = 1
 
     override def onChange(gate:ComboGatePart) =
     {
@@ -341,6 +275,7 @@ object Repeater extends ComboGateLogic
     override def calcOutput(gate:ComboGatePart, input:Int) = if (input == 0) 0 else 1
 
     override def inputMask(shape:Int) = 4
+    override def outputMask(shape:Int) = 1
 
     override def onChange(gate:ComboGatePart) = if (gate.schedTime < 0) super.onChange(gate)
 
@@ -406,9 +341,6 @@ object LightSensor extends ComboGateLogic
 
     override def setup(gate:ComboGatePart){ onTick(gate) }
 
-    //TODO unnecessary, all calls to this overridden
-    override def calcOutput(gate:ComboGatePart, input:Int) = gate.state>>4
-
     override def onTick(gate:ComboGatePart)
     {
         if (gate.world.isRemote) return
@@ -467,9 +399,4 @@ object RainSensor extends ComboGateLogic
     }
 
     override def lightLevel = 0
-}
-
-object ANDCell extends ComboGateLogic
-{
-    //TODO
 }

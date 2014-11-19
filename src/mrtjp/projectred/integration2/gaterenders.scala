@@ -11,7 +11,7 @@ import codechicken.lib.math.MathHelper
 import codechicken.lib.render.{CCRenderState, TextureUtils}
 import codechicken.lib.vec.{RedundantTransformation, Transformation, Vector3}
 import mrtjp.projectred.core.TFaceOrient.flipMaskZ
-import mrtjp.projectred.integration2.ComponentStore.generateWireModels
+import mrtjp.projectred.integration2.ComponentStore._
 import net.minecraft.client.renderer.texture.IIconRegister
 
 object RenderGate
@@ -42,11 +42,11 @@ object RenderGate
         new RenderStateCell,
         new RenderSynchronizer,
         new RenderBusXcvr,
-        new RenderOR, //new RenderNullCell,
-        new RenderOR, //new RenderInvertCell,
-        new RenderOR, //new RenderBufferCell,
+        new RenderNullCell,
+        new RenderInvertCell,
+        new RenderBufferCell,
         new RenderComparator,
-        new RenderOR, //new RenderANDCell,
+        new RenderANDCell,
         new RenderBusRandomizer,
         new RenderBusConverter,
         new RenderBusInputPanel
@@ -129,13 +129,13 @@ abstract class GateRenderer[T <: GatePart]
         prepare(gate)
         val torches = enabledModels.collect
         {
-            case t:RedstoneTorchModel if t.on => t
+            case t:TRedstoneTorchModel if t.on => t
         }
 
         for (t <- torches) if (rand.nextInt(torches.length) == 0)
         {
             val pos = new Vector3(rand.nextFloat, rand.nextFloat, rand.nextFloat).add(-0.5).multiply(0.05, 0.1, 0.05)
-            pos.add(t.lightPos)
+            pos.add(t.getLightPos)
             pos.apply(gate.rotationT).add(gate.x, gate.y, gate.z)
             gate.world.spawnParticle("reddust", pos.x, pos.y, pos.z, 0, 0, 0)
         }
@@ -961,11 +961,11 @@ class RenderBusXcvr extends GateRenderer[BundledGatePart]
     }
 }
 
-class RenderArrayCell
-
-class RenderNullCell extends RenderArrayCell
-class RenderInvertCell extends RenderArrayCell
-class RenderBufferCell extends RenderArrayCell
+//class RenderArrayCell
+//
+//class RenderNullCell extends RenderArrayCell
+//class RenderInvertCell extends RenderArrayCell
+//class RenderBufferCell extends RenderArrayCell
 
 class RenderComparator extends GateRenderer[SequentialGatePart]
 {
@@ -1012,8 +1012,6 @@ class RenderComparator extends GateRenderer[SequentialGatePart]
         chips.foreach(_.renderModel(t, orient%24))
     }
 }
-
-class RenderANDCell
 
 class RenderBusRandomizer extends GateRenderer[BundledGatePart]
 {
@@ -1120,5 +1118,119 @@ class RenderBusInputPanel extends GateRenderer[BundledGatePart]
     override def renderDynamic(t:Transformation)
     {
         buttons.renderLights()
+    }
+}
+
+abstract class RenderArrayCell extends GateRenderer[ArrayGatePart]
+{
+    val topWire:CellTopWireModel
+    val bottomWire:CellBottomWireModel
+
+    override def prepareInv()
+    {
+        bottomWire.signal = 0
+        topWire.signal = 0
+        topWire.conn = 0
+    }
+
+    override def prepare(gate:ArrayGatePart)
+    {
+        val logic = gate.getLogic[ArrayGateLogicCrossing]
+        bottomWire.signal = logic.signal1
+        topWire.signal = logic.signal2
+        topWire.conn = IGateWireRenderConnect.getConnsAtHeight(gate, 10.0D)
+    }
+}
+
+class RenderNullCell extends RenderArrayCell
+{
+    override val topWire:CellTopWireModel = new CellTopWireModel(nullCellWireTop)
+    override val bottomWire:CellBottomWireModel = new CellBottomWireModel(nullCellWireBottom)
+    override val coreModels:Seq[ComponentModel] = Seq(bottomWire, topWire, new CellFrameModel, new NullCellBaseModel)
+}
+
+class RenderInvertCell extends RenderArrayCell
+{
+    val wires = generateWireModels("INVCELL", 1)
+    val torch = new RedstoneTorchModel(8, 8, 6)
+
+    override val topWire:CellTopWireModel = new CellTopWireModel(extendedCellWireTop)
+    override val bottomWire:CellBottomWireModel = new CellBottomWireModel(extendedCellWireBottom)
+    override val coreModels:Seq[ComponentModel] = wires++Seq(torch, bottomWire, topWire, new CellFrameModel, new CellPlateModel, new ExtendedCellBaseModel)
+
+    override def prepareInv()
+    {
+        super.prepareInv()
+        topWire.signal = 255.toByte
+        wires(0).on = false
+        torch.on = true
+    }
+
+    override def prepare(gate:ArrayGatePart)
+    {
+        super.prepare(gate)
+        val logic = gate.getLogic[ArrayGateLogicCrossing]
+        torch.on = logic.signal1 == 0
+        wires(0).on = logic.signal1 != 0
+    }
+}
+
+class RenderBufferCell extends RenderArrayCell
+{
+    val wires = generateWireModels("BUFFCELL", 2)
+    val torches = Seq(new RedstoneTorchModel(11, 13, 6), new RedstoneTorchModel(8, 8, 6))
+
+    override val topWire:CellTopWireModel = new CellTopWireModel(extendedCellWireTop)
+    override val bottomWire:CellBottomWireModel = new CellBottomWireModel(extendedCellWireBottom)
+    override val coreModels:Seq[ComponentModel] = wires++torches++Seq(topWire, bottomWire, new CellFrameModel, new CellPlateModel, new ExtendedCellBaseModel)
+
+    override def prepareInv()
+    {
+        super.prepareInv()
+        wires(0).on = false
+        wires(1).on = true
+        torches(0).on = true
+        torches(1).on = false
+    }
+
+    override def prepare(gate:ArrayGatePart)
+    {
+        super.prepare(gate)
+        val logic = gate.getLogic[ArrayGateLogicCrossing]
+        torches(0).on = logic.signal1 == 0
+        torches(1).on = logic.signal1 != 0
+        wires(0).on = logic.signal1 != 0
+        wires(1).on = logic.signal1 == 0
+    }
+}
+
+class RenderANDCell extends GateRenderer[ArrayGatePart]
+{
+    val wires = generateWireModels("ANDCELL", 2)
+    val torches = Array(new RedstoneTorchModel(8, 13, 6), new RedstoneTorchModel(8, 2, 8), new FlippedRSTorchModel(8, 8))
+    val topWire = new CellTopWireModel(nullCellWireTop)
+
+    override val coreModels:Seq[ComponentModel] = wires++torches++Seq(topWire, new CellFrameModel, new BaseComponentModel)
+
+    override def prepareInv()
+    {
+        topWire.signal = 0
+        topWire.conn = 0
+        torches(0).on = true
+        torches(1).on = false
+        torches(2).on = true
+        wires(0).on = true
+        wires(1).on = false
+    }
+
+    override def prepare(gate:ArrayGatePart)
+    {
+        topWire.signal = gate.getLogic[ANDCell].signal
+        topWire.conn = IGateWireRenderConnect.getConnsAtHeight(gate, 10.0D)
+        torches(0).on = (gate.state&4) == 0
+        torches(1).on = (gate.state&0x10) != 0
+        torches(2).on = (gate.state&0xA) == 0
+        wires(0).on = torches(0).on || torches(2).on
+        wires(1).on = !torches(0).on
     }
 }

@@ -40,10 +40,10 @@ class IntegrationProxy_server extends IProxy with IPartFactory
     {
         case "pr_sgate" => new ComboGatePart
         case "pr_igate" => new SequentialGatePart
-        case "pr_agate" => null
+        case "pr_agate" => new ArrayGatePart
         case "pr_bgate" => new BundledGatePart
         case "pr_tgate" => new SequentialGatePartT
-        case "pr_rgate" => null
+        case "pr_rgate" => new ArrayGatePart //TODO Legacy
         case _ => null
     }
 

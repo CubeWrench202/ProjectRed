@@ -98,8 +98,8 @@ trait TConnectableCommons extends TMultiPart with IConnectable
 
     /**
      * Used to determine which conns can be made outside. Implementations include
-     * 1) for parts that can make internal conns, check if strips, etc. is blocking.
-     * 2) for parts that cannot, always true
+     * 1) for parts that can make external conns, check if strips, etc. is blocking.
+     * 2) for parts that cannot, always false
      * 3) for parts that take up the entire face, always true (i.e. logic tiles)
      *
      * @param dir rot, or absDir (face vs center parts)
@@ -379,7 +379,7 @@ trait TCenterConnectable extends TConnectableCommons with TCenterAcquisitions
      * 0xFC0 = Internal conns to face (mixed with above for client, see clientConnMap)
      * 0x3F000 = External open connections (this wire is not blocked by a cover part and *could* connect through side)
      */
-    var connMap = 0
+    override var connMap = 0
 
     override def canConnectCorner(r:Int) = false
 
@@ -408,8 +408,6 @@ trait TCenterConnectable extends TConnectableCommons with TCenterAcquisitions
     }
 
     override def connectCorner(wire:IConnectable, r:Int, edgeSide:Int) = false
-
-    def canConnectPart(part:IConnectable, s:Int):Boolean
 
     override def maskOpen(s:Int) = (connMap&0x1000<<s) != 0
     override def maskConnects(s:Int) = (connMap&0x41<<s) != 0
