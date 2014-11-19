@@ -20,7 +20,7 @@ import net.minecraftforge.client.IItemRenderer.{ItemRenderType, ItemRendererHelp
 class ItemPartGate extends ItemCore("projectred.integration.gate") with TItemMultiPart with TItemGlassSound
 {
     setHasSubtypes(true)
-    setCreativeTab(ProjectRedIntegration.tabIntegration)
+    //setCreativeTab(ProjectRedIntegration.tabIntegration)
 
     def newPart(item:ItemStack, player:EntityPlayer, world:World, pos:BlockCoord, side:Int, vhit:Vector3):TMultiPart =
     {

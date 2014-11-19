@@ -56,6 +56,6 @@ public enum EnumGate
 
     public ItemStack makeStack()
     {
-        return new ItemStack(ProjectRedIntegration.itemPartGate(), 1, meta);
+        return null; //new ItemStack(ProjectRedIntegration.itemPartGate(), 1, meta);
     }
 }

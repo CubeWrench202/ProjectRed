@@ -23,7 +23,7 @@ class IntegrationProxy_server extends IProxy with IPartFactory
 //            "pr_bgate", "pr_tgate", "pr_rgate"
 //        ))
 
-        itemPartGate = new ItemPartGate
+        //itemPartGate = new ItemPartGate
 
         IntegrationRecipes.initRecipes()
     }
@@ -57,7 +57,7 @@ class IntegrationProxy_client extends IntegrationProxy_server
     override def init()
     {
         super.init()
-        MinecraftForgeClient.registerItemRenderer(ProjectRedIntegration.itemPartGate, GateItemRenderer)
+        //MinecraftForgeClient.registerItemRenderer(ProjectRedIntegration.itemPartGate, GateItemRenderer)
     }
 }
 
