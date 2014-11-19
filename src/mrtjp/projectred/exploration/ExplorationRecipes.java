@@ -11,6 +11,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 public class ExplorationRecipes
 {
@@ -34,6 +35,11 @@ public class ExplorationRecipes
         OreDictionary.registerOre("oreRuby", OreDefs.ORERUBY().makeStack());
         OreDictionary.registerOre("oreSapphire", OreDefs.ORESAPPHIRE().makeStack());
         OreDictionary.registerOre("orePeridot", OreDefs.OREPERIDOT().makeStack());
+
+        OreDictionary.registerOre("blockMarble", DecorativeStoneDefs.MARBLE().makeStack());
+        OreDictionary.registerOre("blockRuby", DecorativeStoneDefs.RUBYBLOCK().makeStack());
+        OreDictionary.registerOre("blockSapphire", DecorativeStoneDefs.SAPPHIREBLOCK().makeStack());
+        OreDictionary.registerOre("blockPeridot", DecorativeStoneDefs.PERIDOTBLOCK().makeStack());
     }
 
     private static void initGemToolRecipes()
@@ -64,7 +70,7 @@ public class ExplorationRecipes
         addSwordRecipe(new ItemStack(ProjectRedExploration.itemPeridotSword()), "gemPeridot");
 
         /** Saw **/
-        addSawRecipe(new ItemStack(ProjectRedExploration.itemGoldSaw()), new ItemStack(Items.gold_ingot));
+        addSawRecipe(new ItemStack(ProjectRedExploration.itemGoldSaw()), "ingotGold");
         addSawRecipe(new ItemStack(ProjectRedExploration.itemRubySaw()), "gemRuby");
         addSawRecipe(new ItemStack(ProjectRedExploration.itemSapphireSaw()), "gemSapphire");
         addSawRecipe(new ItemStack(ProjectRedExploration.itemPeridotSaw()), "gemPeridot");
@@ -72,12 +78,12 @@ public class ExplorationRecipes
         /** Sickle **/
         addSickleRecipe(new ItemStack(ProjectRedExploration.itemWoodSickle()), "plankWood");
         addSickleRecipe(new ItemStack(ProjectRedExploration.itemStoneSickle()), new ItemStack(Items.flint));
-        addSickleRecipe(new ItemStack(ProjectRedExploration.itemIronSickle()), new ItemStack(Items.iron_ingot));
-        addSickleRecipe(new ItemStack(ProjectRedExploration.itemGoldSickle()), new ItemStack(Items.gold_ingot));
+        addSickleRecipe(new ItemStack(ProjectRedExploration.itemIronSickle()), "ingotIron");
+        addSickleRecipe(new ItemStack(ProjectRedExploration.itemGoldSickle()), "ingotGold");
         addSickleRecipe(new ItemStack(ProjectRedExploration.itemRubySickle()), "gemRuby");
         addSickleRecipe(new ItemStack(ProjectRedExploration.itemSapphireSickle()), "gemSapphire");
         addSickleRecipe(new ItemStack(ProjectRedExploration.itemPeridotSickle()), "gemPeridot");
-        addSickleRecipe(new ItemStack(ProjectRedExploration.itemDiamondSickle()), new ItemStack(Items.diamond));
+        addSickleRecipe(new ItemStack(ProjectRedExploration.itemDiamondSickle()), "gemDiamond");
 
     }
 
@@ -88,7 +94,7 @@ public class ExplorationRecipes
                 "ms",
                 " s",
                 'm', m,
-                's', Items.stick
+                's', "stickWood"
                 ));
     }
     private static void addHoeRecipe(ItemStack o, Object m)
@@ -98,7 +104,7 @@ public class ExplorationRecipes
                 " s",
                 " s",
                 'm', m,
-                's', Items.stick
+                's', "stickWood"
                 ));
     }
     private static void addPickaxeRecipe(ItemStack o, Object m)
@@ -108,7 +114,7 @@ public class ExplorationRecipes
                 " s ",
                 " s ",
                 'm', m,
-                's', Items.stick
+                's', "stickWood"
                 ));
     }
     private static void addShovelRecipe(ItemStack o, Object m)
@@ -118,7 +124,7 @@ public class ExplorationRecipes
                 "s",
                 "s",
                 'm', m,
-                's', Items.stick
+                's', "stickWood"
                 ));
     }
     private static void addSwordRecipe(ItemStack o, Object m)
@@ -128,7 +134,7 @@ public class ExplorationRecipes
                 "m",
                 "s",
                 'm', m,
-                's', Items.stick
+                's', "stickWood"
                 ));
     }
     private static void addSawRecipe(ItemStack o, Object m)
@@ -136,7 +142,7 @@ public class ExplorationRecipes
         GameRegistry.addRecipe(new ShapedOreRecipe(o,
                 "srr",
                 "sbb",
-                's', Items.stick,
+                's', "stickWood",
                 'r', "rodStone",
                 'b', m
                 ));
@@ -147,7 +153,7 @@ public class ExplorationRecipes
                 " m ",
                 "  m",
                 "sm ",
-                's', Items.stick,
+                's', "stickWood",
                 'm', m
                 ));
     }
@@ -166,13 +172,13 @@ public class ExplorationRecipes
     private static void initToolRecipes()
     {
         /** Wool Gin **/
-        GameRegistry.addRecipe(new ItemStack(ProjectRedExploration.itemWoolGin()),
+        GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ProjectRedExploration.itemWoolGin()),
                 "sis",
                 "sss",
                 " s ",
-                's', Items.stick,
+                's', "stickWood",
                 'i', PartDefs.IRONCOIL().makeStack()
-                );
+                ));
 
         /** Backpacks **/
         for (int i = 0; i < 16; i++) {
@@ -193,11 +199,11 @@ public class ExplorationRecipes
     private static void initWorldRecipes()
     {
         /** Marble brick **/
-        GameRegistry.addRecipe(DecorativeStoneDefs.MARBLEBRICK().makeStack(4),
+        GameRegistry.addRecipe(new ShapedOreRecipe(DecorativeStoneDefs.MARBLEBRICK().makeStack(4),
                 "bb",
                 "bb",
-                'b', DecorativeStoneDefs.MARBLE().makeStack()
-                );
+                'b', "blockMarble"
+                ));
         /** Basalt brick **/
         GameRegistry.addRecipe(DecorativeStoneDefs.BASALTBRICK().makeStack(4),
                 "bb",
@@ -208,33 +214,33 @@ public class ExplorationRecipes
         GameRegistry.addSmelting(DecorativeStoneDefs.BASALTCOBBLE().makeStack(), DecorativeStoneDefs.BASALT().makeStack(), 0);
 
         /** Ruby block **/
-        GameRegistry.addRecipe(DecorativeStoneDefs.RUBYBLOCK().makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(DecorativeStoneDefs.RUBYBLOCK().makeStack(),
                 "xxx",
                 "xxx",
                 "xxx",
-                'x', PartDefs.RUBY().makeStack()
-                );
+                'x', "gemRuby"
+                ));
         /** Sapphire block **/
-        GameRegistry.addRecipe(DecorativeStoneDefs.SAPPHIREBLOCK().makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(DecorativeStoneDefs.SAPPHIREBLOCK().makeStack(),
                 "xxx",
                 "xxx",
                 "xxx",
-                'x', PartDefs.SAPPHIRE().makeStack()
-                );
+                'x', "gemSapphire"
+                ));
         /** Peridot block **/
-        GameRegistry.addRecipe(DecorativeStoneDefs.PERIDOTBLOCK().makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(DecorativeStoneDefs.PERIDOTBLOCK().makeStack(),
                 "xxx",
                 "xxx",
                 "xxx",
-                'x', PartDefs.PERIDOT().makeStack()
-                );
+                'x', "gemPeridot"
+                ));
 
         /** Ruby **/
-        GameRegistry.addShapelessRecipe(PartDefs.RUBY().makeStack(9), DecorativeStoneDefs.RUBYBLOCK().makeStack());
+        GameRegistry.addRecipe(new ShapelessOreRecipe(PartDefs.RUBY().makeStack(9), "blockRuby"));
         /** Sapphire **/
-        GameRegistry.addShapelessRecipe(PartDefs.SAPPHIRE().makeStack(9), DecorativeStoneDefs.SAPPHIREBLOCK().makeStack());
+        GameRegistry.addRecipe(new ShapelessOreRecipe(PartDefs.SAPPHIRE().makeStack(9), "blockSapphire"));
         /** Peridot **/
-        GameRegistry.addShapelessRecipe(PartDefs.PERIDOT().makeStack(9), DecorativeStoneDefs.PERIDOTBLOCK().makeStack());
+        GameRegistry.addRecipe(new ShapelessOreRecipe(PartDefs.PERIDOT().makeStack(9), "blockPeridot"));
 
         /** Walls **/
         for (int i = 0; i < DecorativeStoneDefs.values().size(); i++)

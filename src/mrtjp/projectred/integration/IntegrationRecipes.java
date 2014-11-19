@@ -238,24 +238,24 @@ public class IntegrationRecipes
                 );
 
         /** Light Sensor **/
-        GameRegistry.addRecipe(EnumGate.LightSensor.makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(EnumGate.LightSensor.makeStack(),
                 "PPP",
                 "LLL",
                 "PWP",
                 'P', PartDefs.PLATE().makeStack(),
-                'L', new ItemStack(Items.dye, 1, Colors.BLUE.dyeId()),
+                'L', "dyeBlue",
                 'W', PartDefs.CONDUCTIVEPLATE().makeStack()
-                );
+                ));
 
         /** Rain Sensor **/
-        GameRegistry.addRecipe(EnumGate.RainSensor.makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(EnumGate.RainSensor.makeStack(),
                 "PPP",
                 "SSS",
                 "PWP",
                 'P', PartDefs.PLATE().makeStack(),
-                'S', Items.slime_ball,
+                'S', "slimeball",
                 'W', PartDefs.CONDUCTIVEPLATE().makeStack()
-                );
+                ));
 
         /** Bus Transceiver **/
         GameRegistry.addRecipe(EnumGate.BusTransceiver.makeStack(),
@@ -300,15 +300,15 @@ public class IntegrationRecipes
                 );
 
         /** Comparator **/
-        GameRegistry.addRecipe(EnumGate.Comparator.makeStack(),
+        GameRegistry.addRecipe(new ShapedOreRecipe(EnumGate.Comparator.makeStack(),
                 "WCW",
                 "QWQ",
                 "PWP",
                 'W', PartDefs.CONDUCTIVEPLATE().makeStack(),
                 'C', PartDefs.CATHODE().makeStack(),
-                'Q', Items.quartz,
+                'Q', "gemQuartz",
                 'P', PartDefs.PLATE().makeStack()
-                );
+                ));
 
         /** AND Cell **/
         GameRegistry.addRecipe(EnumGate.ANDCell.makeStack(),

@@ -1,6 +1,7 @@
 package mrtjp.projectred.transportation
 
 import java.util.UUID
+import codechicken.lib.data.MCDataInput
 import mrtjp.core.item.ItemKeyStack
 import mrtjp.projectred.transportation.Priorities.NetworkPriority
 import net.minecraft.entity.item.EntityItem
@@ -15,30 +16,23 @@ object PipePayload
 {
     private var maxID = 0
 
-    def apply() =
+    private def claimID() =
     {
-        if (maxID < Short.MaxValue)
-        {
-            maxID += 1
-            new PipePayload(maxID-1)
-        }
-        else
-        {
-            maxID = Short.MinValue
-            new PipePayload(maxID)
-        }
+        if (maxID < Short.MaxValue) maxID += 1
+        else maxID = 0
+        maxID
     }
 
-    def apply(id:Int) = new PipePayload(id)
+    def create():PipePayload = new PipePayload(claimID())
 
-    def apply(stack:ItemStack) = make(ItemKeyStack.get(stack))
+    def apply(stack:ItemStack):PipePayload = apply(ItemKeyStack.get(stack))
+    def apply(stack:ItemKeyStack):PipePayload = apply(claimID(), stack)
 
-    def apply(stack:ItemKeyStack) = make(stack)
-
-    private def make(stack:ItemKeyStack):PipePayload =
+    def apply(id:Int, stack:ItemStack):PipePayload = apply(id, ItemKeyStack.get(stack))
+    def apply(id:Int, stack:ItemKeyStack):PipePayload =
     {
-        val r = PipePayload()
-        r.payload = stack
+        val r = new PipePayload(id)
+        r.payload = stack.copy
         r
     }
 }
@@ -46,19 +40,36 @@ object PipePayload
 class PipePayload(val payloadID:Int)
 {
     var payload:ItemKeyStack = null
-
-    var speed = 0.01F
-    var progress = 0.00F
-    var input = 6
-    var output = 6
-    var isEntering = true
     var parent:PayloadPipePart = null
-    var priorityIndex = 0
 
-    def bind(p:PayloadPipePart)
-    {
-        parent = p
-    }
+    // 0000 NNNN PPPP PPPP SSSS SSSS 0EOO OIII
+    // I = input
+    // O = output
+    // E = isEntering
+    // S = speed
+    // P = progress
+    // N = priority index
+    var data = 0
+
+    def isEntering = ((data>>7)&1) != 0
+    def isEntering_=(b:Boolean){ if (b) data |= 0x40 else data &= ~0x40 }
+
+    def speed = ((data>>8)&0xFF)/100.0F
+    def speed_=(f:Float){ data = data&0xFFFF00FF|((f*100).toInt&0xFF)<<8 }
+
+    def progress = ((data>>16)&0xFF)/100.0F
+    def progress_=(f:Float){ data = data&0xFF00FFFF|((f*100).toInt&0xFF)<<16 }
+
+    def input = data&0x7
+    def input_=(i:Int){ data = (data& ~0x7)|(i&0x7) }
+
+    def output = (data>>3)&0x7
+    def output_=(o:Int){ data = (data& ~0x38)|(o&0x7)<<3 }
+
+    def priorityIndex = (data>>24)&0xF
+    def priorityIndex_=(i:Int){ data = (data& ~0xF000000)|(i&0xF)<<24 }
+
+    def bind(p:PayloadPipePart){ parent = p }
 
     def reset()
     {
@@ -81,11 +92,9 @@ class PipePayload(val payloadID:Int)
 
     def isCorrupted = getItemStack == null || getItemStack.stackSize <= 0
 
-    def canEqual(other: Any) = other.isInstanceOf[PipePayload]
-
     override def equals(other:Any) = other match
     {
-        case that:PipePayload => (that canEqual this) && payloadID == that.payloadID
+        case that:PipePayload => payloadID == that.payloadID
         case _ => false
     }
 
@@ -93,35 +102,41 @@ class PipePayload(val payloadID:Int)
 
     def load(tag:NBTTagCompound)
     {
-        progress = tag.getFloat("prog")
-        speed = tag.getFloat("speed")
-        setItemStack(ItemStack.loadItemStackFromNBT(tag.getCompoundTag("Item")))
-        isEntering = tag.getBoolean("isEnt")
-        input = tag.getByte("input")
-        output = tag.getByte("output")
-        loadRouting(tag)
+        if (tag.getBoolean("NoLegacy")) //TODO Legacy
+        {
+            data = tag.getInteger("idata")
+            setItemStack(ItemStack.loadItemStackFromNBT(tag.getCompoundTag("Item")))
+            loadRouting(tag)
+        }
+        else
+        {
+            progress = tag.getFloat("prog")
+            speed = tag.getFloat("speed")
+            setItemStack(ItemStack.loadItemStackFromNBT(tag.getCompoundTag("Item")))
+            isEntering = tag.getBoolean("isEnt")
+            input = tag.getByte("input")
+            output = tag.getByte("output")
+            loadRouting(tag)
+        }
     }
 
     def save(tag:NBTTagCompound)
     {
-        tag.setFloat("prog", progress)
-        tag.setFloat("speed", speed)
+        tag.setBoolean("NoLegacy", true) //TODO Legacy
+        tag.setInteger("idata", data)
         val tag2 = new NBTTagCompound
         getItemStack.writeToNBT(tag2)
         tag.setTag("Item", tag2)
-        tag.setBoolean("isEnt", isEntering)
-        tag.setByte("input", input.asInstanceOf[Byte])
-        tag.setByte("output", output.asInstanceOf[Byte])
         saveRouting(tag)
     }
 
     def getEntityForDrop(x:Int, y:Int, z:Int):EntityItem =
     {
         val dir = if (isEntering) input else output
-        val prog:Double = progress
-        var deltaX = x + 0.5D
-        var deltaY = y + 0.25D
-        var deltaZ = z + 0.5D
+        val prog = progress
+        var deltaX = x+0.5D
+        var deltaY = y+0.25D
+        var deltaZ = z+0.5D
         dir match
         {
             case 0 => deltaY = (y-0.25D)+(1.0D-prog)
@@ -138,7 +153,6 @@ class PipePayload(val payloadID:Int)
         item.motionY = 0
         item.motionZ = 0
         item.hoverStart = 0
-
         dir match
         {
             case 0 => item.motionY = -speed
@@ -209,6 +223,18 @@ class PayloadMovement
     private var delay = 0
 
     def get(id:Int) = delegate.find(_.payloadID == id).orNull
+
+    def getOrElseUpdate(id:Int, f:Unit => PipePayload) =
+    {
+        val payload = get(id)
+        if (payload == null)
+        {
+            val newInput = f(())
+            add(newInput)
+            newInput
+        }
+        else payload
+    }
 
     def scheduleLoad(item:PipePayload)
     {
