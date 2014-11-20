@@ -60,7 +60,7 @@ abstract class GatePart extends TMultiPart with TCuboidPart with TNormalOcclusio
         orientation = tag.getByte("orient")
         gateSubID = tag.getByte("subID")
         gateShape = tag.getByte("shape")
-        connMap = if (tag.getBoolean("nolegacy")) tag.getInteger("connMap") else tag.getShort("connMap")
+        connMap = if (tag.getBoolean("nolegacy")) tag.getInteger("connMap") else tag.getShort("connMap")|0xF000
         schedTime = tag.getLong("schedTime")
     }
 

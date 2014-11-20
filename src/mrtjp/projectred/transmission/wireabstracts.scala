@@ -232,7 +232,7 @@ abstract class WirePart extends TMultiPart with TWireCommons with TFaceConnectab
     override def read(packet:MCDataInput, key:Int) = key match
     {
         case 1 =>
-            connMap = packet.readInt
+            connMap = packet.readInt()
             if (useStaticRenderer) tile.markRender()
         case _ => super.read(packet, key)
     }
@@ -244,15 +244,15 @@ abstract class WirePart extends TMultiPart with TWireCommons with TFaceConnectab
 
     override def canConnectCorner(r:Int) = true
 
-    def canStay =
+    override def canStay =
     {
         val pos = new BlockCoord(tile).offset(side)
         PlacementLib.canPlaceWireOnSide(world, pos.x, pos.y, pos.z, side^1)
     }
 
-    def getItem = getWireType.makeStack
+    override def getItem = getWireType.makeStack
 
-    def setRenderFlag(part:IConnectable) = part match
+    override def setRenderFlag(part:IConnectable) = part match
     {
         case w:WirePart =>
             if (w.getThickness == getThickness) side < w.side else w.getThickness > getThickness
@@ -340,7 +340,7 @@ abstract class FramedWirePart extends TMultiPart with TWireCommons with TCenterC
 
     def clientConnMap = connMap&0x3F|connMap>>6&0x3F
 
-    def sendConnUpdate()
+    override def sendConnUpdate()
     {
         getWriteStreamOf(1).writeByte(clientConnMap)
     }
@@ -350,7 +350,7 @@ abstract class FramedWirePart extends TMultiPart with TWireCommons with TCenterC
         MicroMaterialRegistry.writeMaterialID(getWriteStreamOf(2), material)
     }
 
-    def discoverOpen(s:Int) = getInternal(s) match
+    override def discoverOpen(s:Int) = getInternal(s) match
     {
         case null => true
         case w:WirePart if canConnectPart(w, s) => true
@@ -361,9 +361,9 @@ abstract class FramedWirePart extends TMultiPart with TWireCommons with TCenterC
             fits
     }
 
-    def getType = getWireType.framedType
+    override def getType = getWireType.framedType
 
-    def canStay = true
+    override def canStay = true
 
     override def getStrength(hit:MovingObjectPosition, player:EntityPlayer) =
     {
@@ -371,7 +371,7 @@ abstract class FramedWirePart extends TMultiPart with TWireCommons with TCenterC
         else 4
     }
 
-    def getItem = getWireType.makeFramedStack
+    override def getItem = getWireType.makeFramedStack
 
     override def getDrops =
     {
