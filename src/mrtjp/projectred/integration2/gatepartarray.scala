@@ -144,7 +144,7 @@ trait TArrayGatePart extends RedstoneGatePart with IRedwirePart with TFaceRSProp
         super.preparePlacement(player, pos, side, meta)
         if (getLogicArray.canCross)
         {
-            val npart = PRLib.getMultiPart(player.worldObj, pos, side^1)
+            val npart = PRLib.getMultiPart(player.worldObj, pos, this.side^1)
             npart match
             {
                 case apart:TArrayGatePart => if (apart.subID == subID && (apart.rotation&1) == (rotation&1))
@@ -438,4 +438,7 @@ class ANDCell(gate:ArrayGatePart) extends ArrayGateLogic(gate) with TSimpleRSGat
     override def onSignalUpdate(){ sendSignalUpdate() }
 
     override def calcOutput(gate:ArrayGatePart, input:Int) = if (input == 4 && signal != 0) 1 else 0
+
+    override def getOcclusions(gate:ArrayGatePart) = ArrayGatePart.oBoxes(gate.side)
+    override def getBounds(gate:ArrayGatePart) = ArrayGatePart.cBoxes(gate.side)
 }

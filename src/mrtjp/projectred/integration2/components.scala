@@ -449,7 +449,7 @@ class FlippedRSTorchModel(x:Double, z:Double) extends OnOffModel(RedstoneTorchMo
     new Rotation(180*MathHelper.torad, 0, 0, 1).at(Vector3.center).`with`(new Translation(new Vector3(0, -6, 0).
             multiply(1/16D))))) with TRedstoneTorchModel
 {
-    override val getLightPos = new Vector3(x, 4-1, z).multiply(1/16D)
+    override val getLightPos = new Vector3(x, 4+1, z).multiply(1/16D)
 
     override def getIcons = redstoneTorchIcons
 }

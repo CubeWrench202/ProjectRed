@@ -1225,11 +1225,12 @@ class RenderANDCell extends GateRenderer[ArrayGatePart]
 
     override def prepare(gate:ArrayGatePart)
     {
-        topWire.signal = gate.getLogic[ANDCell].signal
+        val logic = gate.getLogic[ANDCell]
+        topWire.signal = logic.signal
         topWire.conn = IGateWireRenderConnect.getConnsAtHeight(gate, 10.0D)
         torches(0).on = (gate.state&4) == 0
         torches(1).on = (gate.state&0x10) != 0
-        torches(2).on = (gate.state&0xA) == 0
+        torches(2).on = logic.signal == 0
         wires(0).on = torches(0).on || torches(2).on
         wires(1).on = !torches(0).on
     }

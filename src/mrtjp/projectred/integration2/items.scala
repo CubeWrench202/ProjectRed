@@ -22,7 +22,7 @@ import net.minecraft.world.World
 import net.minecraftforge.client.IItemRenderer
 import net.minecraftforge.client.IItemRenderer.{ItemRenderType, ItemRendererHelper}
 
-class ItemPartGate extends ItemCore("projectred.integration.gate1") with TItemMultiPart with TItemGlassSound
+class ItemPartGate extends ItemCore("projectred.integration.gate") with TItemMultiPart with TItemGlassSound
 {
     setHasSubtypes(true)
     setCreativeTab(ProjectRedIntegration.tabIntegration2)

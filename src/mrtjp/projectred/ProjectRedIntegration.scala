@@ -11,7 +11,7 @@ object ProjectRedIntegration
     /** Multipart items **/
     var itemPartGate2:ItemPartGate = null
 
-    var tabIntegration2 = new CreativeTabs("int2")
+    var tabIntegration2 = new CreativeTabs("int")
     {
         override def getIconItemStack = GateDefinition.OR.makeStack
         override def getTabIconItem = getIconItemStack.getItem
