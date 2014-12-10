@@ -1207,7 +1207,7 @@ class RenderBufferCell extends RenderArrayCell
 class RenderANDCell extends GateRenderer[ArrayGatePart]
 {
     val wires = generateWireModels("ANDCELL", 2)
-    val torches = Array(new RedstoneTorchModel(8, 13, 6), new RedstoneTorchModel(8, 2, 8), new FlippedRSTorchModel(8, 8))
+    val torches = Seq(new RedstoneTorchModel(8, 13, 6), new RedstoneTorchModel(8, 2, 8), new FlippedRSTorchModel(8, 8))
     val topWire = new CellTopWireModel(nullCellWireTop)
 
     override val coreModels:Seq[ComponentModel] = wires++torches++Seq(topWire, new CellFrameModel, new BaseComponentModel)

@@ -108,13 +108,10 @@ class BusTransceiver(gate:BundledGatePart) extends BundledGateLogic(gate)
 {
     var input0, output0, input2, output2:Array[Byte] = null
 
-    override def bundledInputMask(shape:Int) = 5
-
     override def bundledOutputMask(shape:Int) = 5
-
-    override def inputMask(shape:Int) = 10
-
+    override def bundledInputMask(shape:Int) = 5
     override def outputMask(shape:Int) = 0
+    override def inputMask(shape:Int) = 10
 
     override def save(tag:NBTTagCompound)
     {
@@ -232,9 +229,7 @@ class BusRandomizer(gate:BundledGatePart) extends BundledGateLogic(gate)
     var mask = 0xFFFF
 
     override def bundledOutputMask(shape:Int) = 5
-
     override def inputMask(shape:Int) = 10
-
     override def outputMask(shape:Int) = 0
 
     override def save(tag:NBTTagCompound)
@@ -349,20 +344,17 @@ class BusConverter(gate:BundledGatePart) extends BundledGateLogic(gate)
     var rsIn, rsOut = 0
     var bOutUnpacked:Array[Byte] = null
 
+    override def bundledOutputMask(shape:Int) = if (shape == 0) 1 else 0
+    override def bundledInputMask(shape:Int) = if (shape == 0) 0 else 1
+    override def outputMask(shape:Int) = if (shape == 0) 10 else 14
+    override def inputMask(shape:Int) = if (shape == 0) 4 else 0
+
     def setBOut(newBOut:Int)
     {
         if (bOut == newBOut) return
         bOut = newBOut
         bOutUnpacked = unpackDigital(bOutUnpacked, bOut)
     }
-
-    override def bundledOutputMask(shape:Int) = if (shape == 0) 1 else 0
-
-    override def bundledInputMask(shape:Int) = if (shape == 0) 0 else 1
-
-    override def outputMask(shape:Int) = if (shape == 0) 10 else 14
-
-    override def inputMask(shape:Int) = if (shape == 0) 4 else 0
 
     override def save(tag:NBTTagCompound)
     {
@@ -491,20 +483,17 @@ class BusInputPanel(gate:BundledGatePart) extends BundledGateLogic(gate)
     var bOut = 0
     var bOutUnpack:Array[Byte] = null
 
+    override def bundledOutputMask(shape:Int) = 4
+    override def bundledInputMask(shape:Int) = 0
+    override def outputMask(shape:Int) = 0
+    override def inputMask(shape:Int) = 1
+
     def setBOut(newBOut:Int)
     {
         if (bOut == newBOut) return
         bOut = newBOut.toShort
         bOutUnpack = unpackDigital(bOutUnpack, bOut)
     }
-
-    override def bundledOutputMask(shape:Int) = 4
-
-    override def bundledInputMask(shape:Int) = 0
-
-    override def outputMask(shape:Int) = 0
-
-    override def inputMask(shape:Int) = 1
 
     override def save(tag:NBTTagCompound)
     {

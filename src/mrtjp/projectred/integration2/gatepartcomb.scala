@@ -133,20 +133,19 @@ abstract class ComboGateLogic extends RedstoneGateLogic[ComboGatePart] with TSim
 
 object OR extends ComboGateLogic
 {
-    override def deadSides = 3
-
-    override def inputMask(shape:Int) = ~shape<<1&0xE
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = ~shape<<1&0xE
+
+    override def deadSides = 3
 
     override def calcOutput(gate:ComboGatePart, input:Int) = if (input != 0) 1 else 0
 }
 
 object NOR extends ComboGateLogic
 {
-    override def feedbackMask(shape:Int) = 1
-
-    override def inputMask(shape:Int) = ~shape<<1&0xE
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = ~shape<<1&0xE
+    override def feedbackMask(shape:Int) = 1
 
     override def deadSides = 3
 
@@ -155,15 +154,9 @@ object NOR extends ComboGateLogic
 
 object NOT extends ComboGateLogic
 {
-    override def feedbackMask(shape:Int) = outputMask(shape)
-
-    override def outputMask(shape:Int) =
-    {
-        val m = (shape&1)<<1|(shape&2)>>1|(shape&4)<<1
-        ~m&0xB
-    }
-
+    override def outputMask(shape:Int) = ~((shape&1)<<1|(shape&2)>>1|(shape&4)<<1)&0xB
     override def inputMask(shape:Int) = 4
+    override def feedbackMask(shape:Int) = outputMask(shape)
 
     override def deadSides = 3
 
@@ -172,8 +165,8 @@ object NOT extends ComboGateLogic
 
 object AND extends ComboGateLogic
 {
-    override def inputMask(shape:Int) = ~shape<<1&0xE
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = ~shape<<1&0xE
 
     override def deadSides = 3
 
@@ -182,8 +175,8 @@ object AND extends ComboGateLogic
 
 object NAND extends ComboGateLogic
 {
-    override def inputMask(shape:Int) = ~shape<<1&0xE
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = ~shape<<1&0xE
 
     override def deadSides = 3
 
@@ -192,8 +185,8 @@ object NAND extends ComboGateLogic
 
 object XOR extends ComboGateLogic
 {
-    override def inputMask(shape:Int) = 10
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = 10
 
     override def calcOutput(gate:ComboGatePart, input:Int) =
     {
@@ -205,8 +198,8 @@ object XOR extends ComboGateLogic
 
 object XNOR extends ComboGateLogic
 {
-    override def inputMask(shape:Int) = 10
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = 10
 
     override def calcOutput(gate:ComboGatePart, input:Int) =
     {
@@ -218,15 +211,9 @@ object XNOR extends ComboGateLogic
 
 object Buffer extends ComboGateLogic
 {
-    override def feedbackMask(shape:Int) = outputMask(shape)
-
-    override def outputMask(shape:Int) =
-    {
-        val m = (shape&1)<<1|(shape&2)<<2|(shape&8)<<4
-        ~m&0xB
-    }
-
+    override def outputMask(shape:Int) = ~((shape&1)<<1|(shape&2)<<2|(shape&8)<<4)&0xB
     override def inputMask(shape:Int) = 4
+    override def feedbackMask(shape:Int) = outputMask(shape)
 
     override def deadSides = 2
 
@@ -236,7 +223,6 @@ object Buffer extends ComboGateLogic
 object Multiplexer extends ComboGateLogic
 {
     override def outputMask(shape:Int) = 1
-
     override def inputMask(shape:Int) = 0xE
 
     override def calcOutput(gate:ComboGatePart, input:Int) = if ((input&1<<2) != 0) (input>>3)&1 else (input>>1)&1
@@ -244,10 +230,10 @@ object Multiplexer extends ComboGateLogic
 
 object Pulse extends ComboGateLogic
 {
-    override def calcOutput(gate:ComboGatePart, input:Int) = 0
-
-    override def inputMask(shape:Int) = 4
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = 4
+
+    override def calcOutput(gate:ComboGatePart, input:Int) = 0
 
     override def onChange(gate:ComboGatePart) =
     {
@@ -272,16 +258,16 @@ object Repeater extends ComboGateLogic
 {
     val delays = Array(2, 4, 6, 8, 16, 32, 64, 128, 256)
 
-    override def calcOutput(gate:ComboGatePart, input:Int) = if (input == 0) 0 else 1
-
-    override def inputMask(shape:Int) = 4
     override def outputMask(shape:Int) = 1
-
-    override def onChange(gate:ComboGatePart) = if (gate.schedTime < 0) super.onChange(gate)
+    override def inputMask(shape:Int) = 4
 
     override def getDelay(shape:Int) = delays(shape)
 
     override def cycleShape(shape:Int) = (shape+1)%delays.length
+
+    override def calcOutput(gate:ComboGatePart, input:Int) = if (input == 0) 0 else 1
+
+    override def onChange(gate:ComboGatePart){ if (gate.schedTime < 0) super.onChange(gate) }
 
     override def activate(gate:ComboGatePart, player:EntityPlayer, held:ItemStack, hit:MovingObjectPosition)=
     {
@@ -298,12 +284,11 @@ object Randomizer extends ComboGateLogic
 {
     val rand = new Random
 
+    override def outputMask(shape:Int) = 0xB
+    override def inputMask(shape:Int) = 4
+
     override def calcOutput(gate:ComboGatePart, input:Int) =
         if (input == 0) gate.state>>4 else TFaceOrient.shiftMask(rand.nextInt(8), 3)
-
-    override def outputMask(shape:Int) = 0xB
-
-    override def inputMask(shape:Int) = 4
 
     override def onChange(gate:ComboGatePart)
     {
@@ -314,11 +299,10 @@ object Randomizer extends ComboGateLogic
 
 object TransparentLatch extends ComboGateLogic
 {
-    override def cycleShape(shape:Int) = shape^1
-
+    override def outputMask(shape:Int) = if (shape == 0) 3 else 9
     override def inputMask(shape:Int) = if (shape == 0) 0xC else 6
 
-    override def outputMask(shape:Int) = if (shape == 0) 3 else 9
+    override def cycleShape(shape:Int) = shape^1
 
     override def calcOutput(gate:ComboGatePart, input:Int) =
     {
@@ -329,15 +313,13 @@ object TransparentLatch extends ComboGateLogic
 
 object LightSensor extends ComboGateLogic
 {
-    override def getOutput(gate:ComboGatePart, r:Int) = if (r == 2) gate.state>>4 else 0
-
-    override def inputMask(shape:Int) = 0
-
     override def outputMask(shape:Int) = 4
-
+    override def inputMask(shape:Int) = 0
     override def feedbackMask(shape:Int) = 4
 
     override def cycleShape(shape:Int) = (shape+1)%3
+
+    override def getOutput(gate:ComboGatePart, r:Int) = if (r == 2) gate.state>>4 else 0
 
     override def setup(gate:ComboGatePart){ onTick(gate) }
 
@@ -379,10 +361,8 @@ object LightSensor extends ComboGateLogic
 
 object RainSensor extends ComboGateLogic
 {
-    override def inputMask(shape:Int) = 0
-
     override def outputMask(shape:Int) = 4
-
+    override def inputMask(shape:Int) = 0
     override def feedbackMask(shape:Int) = 4
 
     override def onTick(gate:ComboGatePart)

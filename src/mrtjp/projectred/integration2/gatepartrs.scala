@@ -151,8 +151,8 @@ abstract class RedstoneGateLogic[T <: RedstoneGatePart] extends GateLogic[T]
     def canConnect(gate:T, r:Int):Boolean = canConnect(gate.shape, r)
     def canConnect(shape:Int, r:Int):Boolean = ((inputMask(shape)|outputMask(shape))&1<<r) != 0
 
-    def inputMask(shape:Int):Int
-    def outputMask(shape:Int):Int
+    def outputMask(shape:Int) = 0
+    def inputMask(shape:Int) = 0
 
     def getOutput(gate:T, r:Int) = if ((gate.state&0x10<<r) != 0) 15 else 0
     def getInput(gate:T, mask:Int) =

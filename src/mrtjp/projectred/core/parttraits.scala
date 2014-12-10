@@ -66,7 +66,7 @@ trait TFaceOrient extends TMultiPart with TFacePart
 
 object TFaceOrient
 {
-    def shiftMask(mask:Int, r:Int) = (mask<<r|mask>>4-r)&0xF
+    def shiftMask(mask:Int, r:Int) = (mask& ~0xF)|(mask<<r|mask>>4-r)&0xF
     def flipMaskZ(mask:Int) = mask&5|mask<<2&8|mask>>2&2
 }
 

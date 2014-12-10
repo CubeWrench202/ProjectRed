@@ -270,6 +270,20 @@ abstract class ArrayGateLogicCrossing(gate:ArrayGatePart) extends ArrayGateLogic
     var signal1:Byte = 0
     var signal2:Byte = 0
 
+    override def redwireMask(shape:Int) = 0xF
+    override def propogationMask(r:Int) = if (r%2 == 0) 0x5 else 0xA
+    override def inputMask(shape:Int) = 0xF
+    override def outputMask(shape:Int) = 0xF
+
+    override def renderConnectMask = 0xA
+    override def getHeight(r:Int) = 10.0D
+
+    override def getSignal(mask:Int) = (if (mask == 0x5) signal1 else signal2)&0xFF
+    override def setSignal(mask:Int, signal:Int)
+    {
+        if (mask == 0x5) signal1 = signal.toByte else signal2 = signal.toByte
+    }
+
     override def save(tag:NBTTagCompound)
     {
         super.save(tag)
@@ -338,25 +352,6 @@ abstract class ArrayGateLogicCrossing(gate:ArrayGatePart) extends ArrayGateLogic
 
     override def getOcclusions(gate:ArrayGatePart) = ArrayGatePart.oBoxes(gate.side)
     override def getBounds(gate:ArrayGatePart) = ArrayGatePart.cBoxes(gate.side)
-
-    override def renderConnectMask = 0xA
-    override def getHeight(r:Int) = 10.0D
-
-    override def inputMask(shape:Int) = 0xF
-    override def outputMask(shape:Int) = 0xF
-    override def redwireMask(shape:Int) = 0xF
-    override def propogationMask(r:Int) = r%2 match
-    {
-        case 0 => 0x5
-        case 1 => 0xA
-    }
-
-    override def getSignal(mask:Int) = (if (mask == 0x5) signal1 else signal2)&0xFF
-
-    override def setSignal(mask:Int, signal:Int)
-    {
-        if (mask == 0x5) signal1 = signal.toByte else signal2 = signal.toByte
-    }
 
     override def onSignalUpdate(){ sendSignalUpdate() }
 

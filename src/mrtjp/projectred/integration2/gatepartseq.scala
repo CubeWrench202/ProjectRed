@@ -11,7 +11,7 @@ import codechicken.multipart.INeighborTileChange
 import codechicken.multipart.handler.MultipartSaveLoad
 import mrtjp.projectred.api.IScrewdriver
 import mrtjp.projectred.core.Configurator
-import mrtjp.projectred.core.TFaceOrient.{flipMaskZ, shiftMask}
+import mrtjp.projectred.core.TFaceOrient._
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
@@ -75,7 +75,7 @@ trait TExtraStateLogic extends SequentialGateLogic
     private var lState2:Byte = 0
 
     def state2 = lState2&0xFF
-    def setState2(state:Int){ lState2 = state.asInstanceOf[Byte] }
+    def setState2(state:Int){ lState2 = state.toByte }
 
     def clientState2 = false
 
@@ -114,19 +114,19 @@ trait TExtraStateLogic extends SequentialGateLogic
 
 class SRLatch(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TExtraStateLogic
 {
+    override def outputMask(shape:Int) = if ((shape>>1) == 0) 0xF else 5
+    override def inputMask(shape:Int) = 0xA
+
     override def cycleShape(gate:SequentialGatePart) =
     {
         gate.setShape((gate.shape+1)%4)
         setState2(flipMaskZ(state2))
+        //gate.setState(flipMaskZ(gate.state>>4)|flipMaskZ(gate.state&0xF))
         gate.setState(flipMaskZ(gate.state))
         gate.onOutputChange(0xF)
         gate.scheduleTick(2)
         true
     }
-
-    override def outputMask(shape:Int) = if ((shape>>1) == 0) 0xF else 5
-
-    override def inputMask(shape:Int) = 0xA
 
     override def setup(gate:SequentialGatePart)
     {
@@ -143,7 +143,7 @@ class SRLatch(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TE
         val oldOutput = gate.state>>4
 
         if (newInput != oldInput)
-            if (stateInput != 0xA && newInput != 0 && newInput != state2) //state needs changing
+            if (stateInput != 0xA && newInput != 0 && newInput != stateInput) //state needs changing
             {
                 gate.setState(newInput)
                 setState2(newInput)
@@ -193,7 +193,7 @@ class SRLatch(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TE
                 if (input == 0) if (gate.world.rand.nextBoolean()) 2 else 8
                 else input
 
-            setState2(stateInput)
+            setState2(if ((gate.shape&1) != 0) flipMaskZ(stateInput) else stateInput)
         }
 
         var output = shiftMask(stateInput, 1)
@@ -206,7 +206,6 @@ class SRLatch(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TE
 class ToggleLatch(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TExtraStateLogic
 {
     override def outputMask(shape:Int) = 5
-
     override def inputMask(shape:Int) = 0xA
 
     override def clientState2 = true
@@ -331,11 +330,9 @@ trait TTimerGateLogic extends SequentialGateLogic with ITimerGuiLogic
         else (gate.world.getTotalWorldTime-pointer_start).toInt
 
     def sendPointerMaxUpdate(){ gate.getWriteStreamOf(12).writeInt(pointer_max) }
-
     def sendPointerUpdate(){ gate.getWriteStreamOf(13).writeInt(if (pointer_start < 0) -1 else pointerValue)}
 
     override def getTimerMax = pointer_max+2
-
     override def setTimerMax(gate:GatePart, time:Int)
     {
         var t = time
@@ -393,7 +390,6 @@ trait TTimerGateLogic extends SequentialGateLogic with ITimerGuiLogic
 class Timer(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TTimerGateLogic
 {
     override def outputMask(shape:Int) = 0xB
-
     override def inputMask(shape:Int) = 0xE
 
     override def setup(gate:SequentialGatePart){ startPointer() }
@@ -438,15 +434,12 @@ class Sequencer(gate:SequentialGatePart) extends SequentialGateLogic(gate) with 
     var pointer_max = 40
 
     override def outputMask(shape:Int) = 0xF
-
     override def inputMask(shape:Int) = 0
 
     override def onChange(gate:SequentialGatePart){}
-
     override def scheduledTick(gate:SequentialGatePart){}
 
     override def getTimerMax = pointer_max
-
     override def setTimerMax(gate:GatePart, time:Int)
     {
         var t = time
@@ -513,7 +506,6 @@ class Counter(gate:SequentialGatePart) extends SequentialGateLogic(gate) with IC
     var decr = 1
 
     override def outputMask(shape:Int) = 5
-
     override def inputMask(shape:Int) = 10
 
     override def save(tag:NBTTagCompound)
@@ -555,19 +547,13 @@ class Counter(gate:SequentialGatePart) extends SequentialGateLogic(gate) with IC
     }
 
     def sendValueUpdate(){ gate.getWriteStreamOf(11).writeInt(value) }
-
     def sendMaxUpdate(){ gate.getWriteStreamOf(12).writeInt(max) }
-
     def sendIncrUpdate(){ gate.getWriteStreamOf(13).writeInt(incr) }
-
     def sendDecrUpdate(){ gate.getWriteStreamOf(14).writeInt(decr) }
 
     override def getCounterValue = value
-
     override def getCounterMax = max
-
     override def getCounterIncr = incr
-
     override def getCounterDecr = decr
 
     override def setCounterValue(gate:GatePart, i:Int)
@@ -667,12 +653,6 @@ class Counter(gate:SequentialGatePart) extends SequentialGateLogic(gate) with IC
 
 class StateCell(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TTimerGateLogic with TExtraStateLogic
 {
-    override def cycleShape(gate:SequentialGatePart) =
-    {
-        gate.setShape((gate.shape+1)%2)
-        true
-    }
-
     override def outputMask(shape:Int) =
     {
         var output = 9
@@ -685,6 +665,12 @@ class StateCell(gate:SequentialGatePart) extends SequentialGateLogic(gate) with 
         var input = 6
         if (shape == 1) input = flipMaskZ(input)
         input
+    }
+
+    override def cycleShape(gate:SequentialGatePart) =
+    {
+        gate.setShape((gate.shape+1)%2)
+        true
     }
 
     override def onChange(gate:SequentialGatePart)
@@ -737,7 +723,6 @@ class StateCell(gate:SequentialGatePart) extends SequentialGateLogic(gate) with 
 class Synchronizer(gate:SequentialGatePart) extends SequentialGateLogic(gate) with TExtraStateLogic
 {
     override def outputMask(shape:Int) = 1
-
     override def inputMask(shape:Int) = 14
 
     override def onChange(gate:SequentialGatePart)
@@ -794,8 +779,8 @@ class Comparator(gate:SequentialGatePart) extends SequentialGateLogic(gate) with
     def state2 = lState2&0xFFFF
     def setState2(i:Int){ lState2 = i.toShort }
 
-    override def inputMask(shape:Int) = 0xE
     override def outputMask(shape:Int) = 1
+    override def inputMask(shape:Int) = 0xE
 
     override def save(tag:NBTTagCompound){ tag.setShort("state2", lState2) }
     override def load(tag:NBTTagCompound){ lState2 = tag.getShort("state2") }
