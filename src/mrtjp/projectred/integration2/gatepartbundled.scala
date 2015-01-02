@@ -491,7 +491,7 @@ class BusInputPanel(gate:BundledGatePart) extends BundledGateLogic(gate)
     def setBOut(newBOut:Int)
     {
         if (bOut == newBOut) return
-        bOut = newBOut.toShort
+        bOut = newBOut
         bOutUnpack = unpackDigital(bOutUnpack, bOut)
     }
 
@@ -504,7 +504,7 @@ class BusInputPanel(gate:BundledGatePart) extends BundledGateLogic(gate)
     override def load(tag:NBTTagCompound)
     {
         pressMask = tag.getShort("press")
-        setBOut(tag.getShort("mask"))
+        setBOut(tag.getShort("mask")&0xFFFF)
     }
 
     override def writeDesc(packet:MCDataOutput)
