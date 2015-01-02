@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.vec.{BlockCoord, Rotation}
@@ -44,7 +44,7 @@ class SequentialGatePartT extends SequentialGatePart with INeighborTileChange
 
 object SequentialGateLogic
 {
-    import mrtjp.projectred.integration2.GateDefinition._
+    import mrtjp.projectred.integration.GateDefinition._
     def create(gate:SequentialGatePart, subID:Int) = subID match
     {
         case SRLatch.ordinal => new SRLatch(gate)

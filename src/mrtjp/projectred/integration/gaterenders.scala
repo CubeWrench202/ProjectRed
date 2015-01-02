@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import java.util.Random
 
@@ -11,7 +11,7 @@ import codechicken.lib.math.MathHelper
 import codechicken.lib.render.{CCRenderState, TextureUtils}
 import codechicken.lib.vec.{RedundantTransformation, Transformation, Vector3}
 import mrtjp.projectred.core.TFaceOrient.flipMaskZ
-import mrtjp.projectred.integration2.ComponentStore._
+import mrtjp.projectred.integration.ComponentStore._
 import net.minecraft.client.renderer.texture.IIconRegister
 
 object RenderGate

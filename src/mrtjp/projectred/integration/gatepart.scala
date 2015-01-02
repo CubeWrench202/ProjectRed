@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.raytracer.IndexedCuboid6

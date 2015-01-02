@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import java.util.Random
 
@@ -70,7 +70,7 @@ class BundledGatePart extends RedstoneGatePart with TComplexGatePart with TFaceB
 
 object BundledGateLogic
 {
-    import mrtjp.projectred.integration2.GateDefinition._
+    import mrtjp.projectred.integration.GateDefinition._
     def create(gate:BundledGatePart, subID:Int) = subID match
     {
         case BusTransceiver.ordinal => new BusTransceiver(gate)

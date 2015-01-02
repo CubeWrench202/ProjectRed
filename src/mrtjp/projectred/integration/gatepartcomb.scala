@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import java.util.Random
 
@@ -31,7 +31,7 @@ object ComboGateLogic
 
     def initialize()
     {
-        import mrtjp.projectred.integration2.{GateDefinition => defs}
+        import mrtjp.projectred.integration.{GateDefinition => defs}
 
         instances(defs.OR.ordinal) = OR
         instances(defs.NOR.ordinal) = NOR

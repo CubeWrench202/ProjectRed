@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import codechicken.lib.data.{MCDataInput, MCDataOutput}
 import codechicken.lib.vec._
@@ -251,7 +251,7 @@ object ArrayGatePart
 
 object ArrayGateLogic
 {
-    import mrtjp.projectred.integration2.GateDefinition._
+    import mrtjp.projectred.integration.GateDefinition._
     def create(gate:ArrayGatePart, subID:Int) = subID match
     {
         case NullCell.ordinal => new NullCell(gate)

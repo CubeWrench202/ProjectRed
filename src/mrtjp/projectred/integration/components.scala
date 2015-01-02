@@ -3,7 +3,7 @@
  * Created by MrTJP.
  * All rights reserved.
  */
-package mrtjp.projectred.integration2
+package mrtjp.projectred.integration
 
 import codechicken.lib.colour.Colour
 import codechicken.lib.lighting.{PlanarLightModel, PlanarLightMatrix, LightModel}
