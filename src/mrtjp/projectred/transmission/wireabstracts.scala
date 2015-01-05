@@ -225,7 +225,7 @@ abstract class WirePart extends TMultiPart with TWireCommons with TFaceConnectab
 
     override def readDesc(packet:MCDataInput)
     {
-        connMap = packet.readInt
+        connMap = packet.readInt()
         orientation = packet.readByte
     }
 

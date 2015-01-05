@@ -257,14 +257,11 @@ class PayloadPipePart extends SubcorePipePart with TPipeTravelConditions
             if (r.isEntering && hasReachedMiddle(r))
             {
                 r.isEntering = false
-                if (!(0 to 5 contains r.output)) handleDrop(r)
+                if (r.output == 6) handleDrop(r)
                 else centerReached(r)
             }
             else if (!r.isEntering && hasReachedEnd(r))
-            {
-                if (!(0 to 5 contains r.output)) handleDrop(r)
-                else if (itemFlow.scheduleRemoval(r)) endReached(r)
-            }
+                if (itemFlow.scheduleRemoval(r)) endReached(r)
         }
         itemFlow.exececuteRemove()
     }
@@ -298,16 +295,42 @@ class PayloadPipePart extends SubcorePipePart with TPipeTravelConditions
 
     def endReached(r:PipePayload)
     {
-        if (!world.isRemote) if (!maskConnects(r.output) || !passToNextPipe(r))
+        if (!world.isRemote)
+            if(!(maskConnects(r.output) && passPayload(r)))
+                if (r.payload.stackSize > 0) bounceStack(r)
+    }
+
+    def passPayload(r:PipePayload):Boolean =
+    {
+        if (passToInventory(r)) return r.payload.stackSize > 0
+
+        if (passToNextPipe(r)) return true
+
+        false
+    }
+
+    def passToNextPipe(r:PipePayload) =
+    {
+        getStraight(r.output) match
         {
-            val inv = InvWrapper.getInventory(world, new BlockCoord(tile).offset(r.output))
-            if (inv != null)
-            {
-                val w = InvWrapper.wrap(inv).setSlotsFromSide(r.output^1)
-                r.payload.stackSize -= w.injectItem(r.payload.makeStack, true)
-            }
-            if (r.payload.stackSize > 0) bounceStack(r)
+            case pipe:PayloadPipePart =>
+                pipe.injectPayload(r, r.output)
+                true
+            case _ => false
         }
+    }
+
+    def passToInventory(r:PipePayload) =
+    {
+        val inv = InvWrapper.getInventory(world, posOfStraight(r.output))
+        if (inv != null)
+        {
+            val w = InvWrapper.wrap(inv).setSlotsFromSide(r.output^1)
+            r.payload.stackSize -= w.injectItem(r.payload.makeStack, true)
+            true
+        }
+
+        false
     }
 
     def bounceStack(r:PipePayload)
@@ -327,17 +350,6 @@ class PayloadPipePart extends SubcorePipePart with TPipeTravelConditions
         {
             resolveDestination(r)
             sendItemUpdate(r)
-        }
-    }
-
-    def passToNextPipe(r:PipePayload) =
-    {
-        getStraight(r.output) match
-        {
-            case pipe:PayloadPipePart =>
-                pipe.injectPayload(r, r.output)
-                true
-            case _ => false
         }
     }
 
