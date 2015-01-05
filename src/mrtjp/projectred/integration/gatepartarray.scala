@@ -107,7 +107,12 @@ trait TArrayGatePart extends RedstoneGatePart with IRedwirePart with TFaceRSProp
     }
 
     override def getRedwireSignal(r:Int) =
-        getLogicArray.getSignal(getLogicArray.propogationMask(toInternal(r)))
+    {
+        val ir = toInternal(r)
+        val pmask = getLogicArray.propogationMask(ir)
+        if (pmask != 0) getLogicArray.getSignal(pmask)
+        else getLogicRS.getOutput(this, ir)*17
+    }
 
     abstract override def canConnectRedstone(side:Int):Boolean =
     {
@@ -196,7 +201,7 @@ trait TArrayGateLogic[T <: TArrayGatePart] extends RedstoneGateLogic[T]
 {
     abstract override def canConnecetTo(gate:T, part:IConnectable, r:Int) = part match
     {
-        case re:IRedwireEmitter if canConnectRedwire(gate, r) => true
+        case re:IRedwirePart if canConnectRedwire(gate, r) => true
         case _ => super.canConnecetTo(gate, part, r)
     }
 
@@ -258,12 +263,13 @@ object ArrayGateLogic
         case InvertCell.ordinal => new InvertCell(gate)
         case BufferCell.ordinal => new BufferCell(gate)
         case ANDCell.ordinal => new ANDCell(gate)
+        case StackingLatch.ordinal => new StackingLatch(gate)
         case _ => null
     }
 
 }
 
-abstract class ArrayGateLogic(gate:ArrayGatePart) extends RedstoneGateLogic[ArrayGatePart] with TArrayGateLogic[ArrayGatePart] with TComlexGateLogic[ArrayGatePart]
+abstract class ArrayGateLogic(val gate:ArrayGatePart) extends RedstoneGateLogic[ArrayGatePart] with TArrayGateLogic[ArrayGatePart] with TComlexGateLogic[ArrayGatePart]
 
 abstract class ArrayGateLogicCrossing(gate:ArrayGatePart) extends ArrayGateLogic(gate) with IGateWireRenderConnect
 {
@@ -381,20 +387,15 @@ class BufferCell(gate:ArrayGatePart) extends ArrayGateLogicCrossing(gate)
     override def powerUp = (gate.state&2) == 0
 }
 
-class ANDCell(gate:ArrayGatePart) extends ArrayGateLogic(gate) with TSimpleRSGateLogic[ArrayGatePart] with IGateWireRenderConnect
+trait TArrayCellBottomOnly extends ArrayGateLogic
 {
     var signal:Byte = 0
 
     override def redwireMask(shape:Int) = 0xA
     override def propogationMask(r:Int) = if (r%2 == 1) 0xA else 0
-    override def inputMask(shape:Int) = 4
-    override def outputMask(shape:Int) = 1
 
     override def getSignal(mask:Int) = if (mask == 0xA) signal&0xFF else 0
     override def setSignal(mask:Int, sig:Int){ if (mask == 0xA) signal = sig.toByte }
-
-    override def renderConnectMask = 0xA
-    override def getHeight(r:Int) = 10.0D
 
     override def save(tag:NBTTagCompound)
     {
@@ -431,9 +432,28 @@ class ANDCell(gate:ArrayGatePart) extends ArrayGateLogic(gate) with TSimpleRSGat
     def sendSignalUpdate(){ gate.getWriteStreamOf(11).writeByte(signal) }
 
     override def onSignalUpdate(){ sendSignalUpdate() }
+}
+
+class ANDCell(gate:ArrayGatePart) extends ArrayGateLogic(gate) with TArrayCellBottomOnly with TSimpleRSGateLogic[ArrayGatePart] with IGateWireRenderConnect
+{
+    override def inputMask(shape:Int) = 4
+    override def outputMask(shape:Int) = 1
+
+    override def renderConnectMask = 0xA
+    override def getHeight(r:Int) = 10.0D
 
     override def calcOutput(gate:ArrayGatePart, input:Int) = if (input == 4 && signal != 0) 1 else 0
 
     override def getOcclusions(gate:ArrayGatePart) = ArrayGatePart.oBoxes(gate.side)
     override def getBounds(gate:ArrayGatePart) = ArrayGatePart.cBoxes(gate.side)
+}
+
+class StackingLatch(gate:ArrayGatePart) extends ArrayGateLogic(gate) with TArrayCellBottomOnly with TSimpleRSGateLogic[ArrayGatePart]
+{
+    override def inputMask(shape:Int) = 4
+    override def outputMask(shape:Int) = 1
+
+    override def calcOutput(gate:ArrayGatePart, input:Int) =
+        if (signal == 0) gate.state>>4
+        else if ((input&4) == 0) 0 else 1
 }

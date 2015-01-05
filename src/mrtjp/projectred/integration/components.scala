@@ -48,6 +48,9 @@ object ComponentStore
     val cellFrame = loadModel("array/cellstand").apply(new Translation(0.5, 0, 0.5))
     val cellPlate = loadModel("array/cellplate").apply(new Translation(0.5, 0, 0.5))
 
+    val stackLatchWireBottom = loadModel("array/stacklatchwire").apply(new Translation(0.5, 0, 0.5))
+    val stackStand = loadModel("array/latchstand")
+
     var baseIcon:IIcon = null
     var wireIcons:Array[IIcon] = new Array[IIcon](3)
     var wireData:Array[Array[Colour]] = new Array[Array[Colour]](3)
@@ -792,6 +795,11 @@ class NullCellBaseModel extends SingleComponentModel(nullCellBase)
 }
 
 class ExtendedCellBaseModel extends SingleComponentModel(extendedCellBase)
+{
+    override def getUVT = new IconTransformation(cellIcon)
+}
+
+class StackLatchStand(x:Double, z:Double) extends SingleComponentModel(stackStand, new Vector3(x, 2, z))
 {
     override def getUVT = new IconTransformation(cellIcon)
 }

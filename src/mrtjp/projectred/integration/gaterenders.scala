@@ -49,7 +49,8 @@ object RenderGate
         new RenderANDCell,
         new RenderBusRandomizer,
         new RenderBusConverter,
-        new RenderBusInputPanel
+        new RenderBusInputPanel,
+        new RenderStackingLatch
     )
 
     def registerIcons(reg:IIconRegister)
@@ -93,9 +94,9 @@ object RenderGate
 
 abstract class GateRenderer[T <: GatePart]
 {
-    val coreModels:Seq[ComponentModel]
     var reflect = false
 
+    def coreModels:Seq[ComponentModel]
     def switchModels = Seq[ComponentModel]()
     def allSwitchModels = Seq[ComponentModel]()
 
@@ -1233,5 +1234,46 @@ class RenderANDCell extends GateRenderer[ArrayGatePart]
         torches(2).on = logic.signal == 0
         wires(0).on = torches(0).on || torches(2).on
         wires(1).on = !torches(0).on
+    }
+}
+
+class RenderStackingLatch extends GateRenderer[ArrayGatePart]
+{
+    var wires = generateWireModels("STACKLATCH", 5)
+    var clkwire = new CellBottomWireModel(stackLatchWireBottom)
+    var torches = Seq(new RedstoneTorchModel(12.5, 12, 6), new RedstoneTorchModel(8, 12, 6),
+        new RedstoneTorchModel(8, 8, 6), new RedstoneTorchModel(8, 2, 8))
+
+    override val coreModels:Seq[ComponentModel] = wires++torches++Seq(clkwire, new StackLatchStand(3.5, 5),
+        new StackLatchStand(12.5, 5), new BaseComponentModel)
+
+    override def prepareInv()
+    {
+        clkwire.signal = 0
+        wires(0).on = true
+        wires(1).on = false
+        wires(2).on = true
+        wires(3).on = false
+        wires(4).on = false
+        torches(0).on = true
+        torches(1).on = false
+        torches(2).on = true
+        torches(3).on = false
+    }
+
+    override def prepare(gate:ArrayGatePart)
+    {
+        val on = (gate.state&0x10) != 0
+        val sig = gate.getLogic[StackingLatch].signal
+        clkwire.signal = sig
+        wires(0).on = !on
+        wires(1).on = sig != 0
+        wires(2).on = sig == 0
+        wires(3).on = on
+        wires(4).on = (gate.state&4) != 0
+        torches(0).on = wires(2).on
+        torches(1).on = !wires(2).on && !wires(4).on
+        torches(2).on = !wires(1).on && !wires(3).on
+        torches(3).on = on
     }
 }

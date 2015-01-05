@@ -92,6 +92,7 @@ object GateDefinition extends ItemDefinition
     val BusRandomizer = new GateDef("pr_bgate")
     val BusConverter = new GateDef("pr_bgate")
     val BusInputPanel = new GateDef("pr_bgate")
+    val StackingLatch = new GateDef("pr_agate")
 
     class GateDef(val partname:String) extends ItemDef
     {

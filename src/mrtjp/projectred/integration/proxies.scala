@@ -425,5 +425,15 @@ object IntegrationRecipes
                 'R':JChar, PartDefs.CONDUCTIVEPLATE.makeStack,
                 'I':JChar, PartDefs.oreDictDefinitionIllumar
         ))
+
+        /** Stacking Latch **/
+        GameRegistry.addRecipe(GateDefinition.StackingLatch.makeStack,
+            "PCP",
+            "RCR",
+            "PCC",
+            'P':JChar, PartDefs.PLATE.makeStack,
+            'C':JChar, PartDefs.CATHODE.makeStack,
+            'R':JChar, PartDefs.WIREDPLATE.makeStack
+        )
     }
 }
