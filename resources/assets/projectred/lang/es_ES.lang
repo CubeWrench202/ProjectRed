@@ -1,76 +1,76 @@
-itemGroup.core=Project Red: Core
+itemGroup.core=Project Red: Nucleo
 
-item.projectred.core.part.partplate.name=Circuit Plate
-item.projectred.core.part.partconductiveplate.name=Conductive Plate
-item.projectred.core.part.partwiredplate.name=Wired Plate
-item.projectred.core.part.partbundledplate.name=Bundled Plate
-item.projectred.core.part.partanode.name=Anode
-item.projectred.core.part.partcathode.name=Cathode
-item.projectred.core.part.partpointer.name=Pointer
-item.projectred.core.part.partsiliconchip.name=Silicon Chip
-item.projectred.core.part.partenergizedsiliconchip.name=Energized Silicon Chip
-item.projectred.core.part.partplatformedplate.name=Platformed Plate
-item.projectred.core.part.partredingot.name=Red Alloy Ingot
-item.projectred.core.part.partboule.name=Silicon Boule
-item.projectred.core.part.partsilicon.name=Silicon
-item.projectred.core.part.partinfusedsilicon.name=Infused Silicon
-item.projectred.core.part.partenergizedsilicon.name=Energized Silicon
-item.projectred.core.part.partmotor.name=Motor
-item.projectred.core.part.partcoppercoil.name=Copper Coil
-item.projectred.core.part.partironcoil.name=Iron Coil
-item.projectred.core.part.partgoldcoil.name=Golden Coil
+item.projectred.core.part.partplate.name=Placa De Circuito
+item.projectred.core.part.partconductiveplate.name=Placa Conductora
+item.projectred.core.part.partwiredplate.name=Placa De Cable
+item.projectred.core.part.partbundledplate.name=Placa De Cable Liado
+item.projectred.core.part.partanode.name=Ánodo
+item.projectred.core.part.partcathode.name=Cátodo
+item.projectred.core.part.partpointer.name=Puntero
+item.projectred.core.part.partsiliconchip.name=Chip De Silício
+item.projectred.core.part.partenergizedsiliconchip.name=Chip De Silício Energizado
+item.projectred.core.part.partplatformedplate.name=Placa De Plataforma
+item.projectred.core.part.partredingot.name=Lingote De Aleación Rojo
+item.projectred.core.part.partboule.name=Boule De Silício
+item.projectred.core.part.partsilicon.name=Silício
+item.projectred.core.part.partinfusedsilicon.name=Silício Infusa
+item.projectred.core.part.partenergizedsilicon.name=Silício Infusa
+item.projectred.core.part.partmotor.name=Motór
+item.projectred.core.part.partcoppercoil.name=Bobina De Cobre
+item.projectred.core.part.partironcoil.name=Bobina De Hierro
+item.projectred.core.part.partgoldcoil.name=Bobina De Oro
 
-item.projectred.core.part.illumar0.name=White Illumar
-item.projectred.core.part.illumar1.name=Orange Illumar
-item.projectred.core.part.illumar2.name=Magenta Illumar
-item.projectred.core.part.illumar3.name=Light Blue Illumar
-item.projectred.core.part.illumar4.name=Yellow Illumar
-item.projectred.core.part.illumar5.name=Lime Illumar
-item.projectred.core.part.illumar6.name=Pink Illumar
-item.projectred.core.part.illumar7.name=Grey Illumar
-item.projectred.core.part.illumar8.name=Light Grey Illumar
-item.projectred.core.part.illumar9.name=Cyan Illumar
-item.projectred.core.part.illumar10.name=Purple Illumar
-item.projectred.core.part.illumar11.name=Blue Illumar
-item.projectred.core.part.illumar12.name=Brown Illumar
-item.projectred.core.part.illumar13.name=Green Illumar
-item.projectred.core.part.illumar14.name=Red Illumar
-item.projectred.core.part.illumar15.name=Black Illumar
+item.projectred.core.part.illumar0.name=Illumar Blanco
+item.projectred.core.part.illumar1.name=Illumar Naranja
+item.projectred.core.part.illumar2.name=Illumar Magenta
+item.projectred.core.part.illumar3.name=Illumar Celeste
+item.projectred.core.part.illumar4.name=Illumar Amarillo
+item.projectred.core.part.illumar5.name=Illumar Lima
+item.projectred.core.part.illumar6.name=Illumar Rosa
+item.projectred.core.part.illumar7.name=Illumar Gris
+item.projectred.core.part.illumar8.name=Illumar Gris Claro
+item.projectred.core.part.illumar9.name=Illumar Cian
+item.projectred.core.part.illumar10.name=Illumar Purpura
+item.projectred.core.part.illumar11.name=Illumar Azul
+item.projectred.core.part.illumar12.name=Illumar Marron
+item.projectred.core.part.illumar13.name=Illumar Verde
+item.projectred.core.part.illumar14.name=Illumar Rojo
+item.projectred.core.part.illumar15.name=Illumar Negro
 
-item.projectred.core.part.partcloth.name=Woven Cloth
-item.projectred.core.part.partsail.name=Sail
-item.projectred.core.part.gemruby.name=Ruby
-item.projectred.core.part.gemsapphire.name=Sapphire
-item.projectred.core.part.gemperidot.name=Peridot
-item.projectred.core.part.partredironcomp.name=Red Iron Compound
-item.projectred.core.part.partsandcoalcomp.name=Sandy Coal Compound
-item.projectred.core.part.partredsiliconcomp.name=Red Silicon Compound
-item.projectred.core.part.partglowsiliconcomp.name=Glowing Silicon Compound
+item.projectred.core.part.partcloth.name=Tela Tejida
+item.projectred.core.part.partsail.name=Vela
+item.projectred.core.part.gemruby.name=Rubí
+item.projectred.core.part.gemsapphire.name=Zafiro
+item.projectred.core.part.gemperidot.name=Peridoto
+item.projectred.core.part.partredironcomp.name=Lingote De Hierro Rojo Compuesto
+item.projectred.core.part.partsandcoalcomp.name=Carbon Arenoso Compuesto
+item.projectred.core.part.partredsiliconcomp.name=Silício Rojo Compuesto
+item.projectred.core.part.partglowsiliconcomp.name=Silício Brillante Compuesto
 
-item.projectred.core.part.nullchip.name=Null-Logic Routing Chip
-item.projectred.core.part.nullupgrd.name=Null-Logic Upgrade Chip
-item.projectred.core.part.upgrd_lx.name=LX Upgrade
-item.projectred.core.part.upgrd_ly.name=LY Upgrade
-item.projectred.core.part.upgrd_lz.name=LZ Upgrade
-item.projectred.core.part.upgrd_rx.name=RX Upgrade
-item.projectred.core.part.upgrd_ry.name=RY Upgrade
-item.projectred.core.part.upgrd_rz.name=RZ Upgrade
-
-
-item.projectred.core.drawplate.name=Draw Plate
-item.projectred.core.wiredebugger.name=Wire Debugger
-item.projectred.core.screwdriver.name=Screwdriver
-item.projectred.core.routerutil.name=Router Utility
-item.projectred.core.datacard.name=Data Card
+item.projectred.core.part.nullchip.name=Chip De Enrutamiento Nulo-Logico
+item.projectred.core.part.nullupgrd.name=Chip De Mejora Nulo-Logico
+item.projectred.core.part.upgrd_lx.name=Mejora LX
+item.projectred.core.part.upgrd_ly.name=Mejora LY
+item.projectred.core.part.upgrd_lz.name=Mejora LZ
+item.projectred.core.part.upgrd_rx.name=Mejora RX
+item.projectred.core.part.upgrd_ry.name=Mejora RY
+item.projectred.core.part.upgrd_rz.name=Mejora RZ
 
 
+item.projectred.core.drawplate.name=Placa De Dibujo
+item.projectred.core.wiredebugger.name=Debugger De Cable
+item.projectred.core.screwdriver.name=Destornillador
+item.projectred.core.routerutil.name=Enrutador De Utilidades
+item.projectred.core.datacard.name=Tarjeta De Datos
 
 
-itemGroup.expansion=Project Red: Expansion
-tile.projectred.expansion.machine2|0.name=Routing Network Controller
 
 
-itemGroup.transport=Project Red: Transportation
+itemGroup.expansion=Project Red: Expansión
+tile.projectred.expansion.machine2|0.name=Enrutador De Red Controladór
+
+
+itemGroup.transport=Project Red: Transportación
 
 item.projectred.transportation.routingchip|0.name=Item Responder chip
 item.projectred.transportation.routingchip|1.name=Dynamic Item Responder chip
@@ -95,20 +95,20 @@ item.projectred.transportation.pipe|5.name=Routed Extension pipe
 item.projectred.transportation.pipe|6.name=Routed Firewall pipe
 
 
-itemGroup.exploration=Project Red: Exploration
+itemGroup.exploration=Project Red: Exploración
 
-tile.projectred.exploration.ore|0.name=Ruby Ore
-tile.projectred.exploration.ore|1.name=Sapphire Ore
-tile.projectred.exploration.ore|2.name=Peridot Ore
-tile.projectred.exploration.stone|0.name=Marble
-tile.projectred.exploration.stone|1.name=Marble Brick
-tile.projectred.exploration.stone|2.name=Basalt Cobblestone
-tile.projectred.exploration.stone|3.name=Basalt
-tile.projectred.exploration.stone|4.name=Basalt Brick
-tile.projectred.exploration.stone|5.name=Block of Ruby
-tile.projectred.exploration.stone|6.name=Block of Sapphire
-tile.projectred.exploration.stone|7.name=Block of Peridot
-item.projectred.exploration.woolgin.name=Wool Gin
+tile.projectred.exploration.ore|0.name=Ore De Rubí
+tile.projectred.exploration.ore|1.name=Ore De Zafiro
+tile.projectred.exploration.ore|2.name=Ore De Peridoto
+tile.projectred.exploration.stone|0.name=Marmol
+tile.projectred.exploration.stone|1.name=Ladrillos De Marmol
+tile.projectred.exploration.stone|2.name=Roca De Basalto
+tile.projectred.exploration.stone|3.name=Basalto
+tile.projectred.exploration.stone|4.name=Ladrillos De Basalto
+tile.projectred.exploration.stone|5.name=Bloque De Rubí
+tile.projectred.exploration.stone|6.name=Bloque De Zafiro
+tile.projectred.exploration.stone|7.name=Bloque De Peridoto
+item.projectred.exploration.woolgin.name=Desmolteadora de Lana
 item.projectred.exploration.backpack|0.name=White Backpack
 item.projectred.exploration.backpack|1.name=Orange Backpack
 item.projectred.exploration.backpack|2.name=Magenta Backpack
